@@ -4,7 +4,7 @@ using System.Net.Http;
 using HtmlAgilityPack;
 using Nest;
 
-// Bu sınıf ürün/haber bilgilerini tutmak için kullanılır
+// Bu sınıf ürün bilgilerini tutmak için kullanılır
 public class Product
 {
     public string Title { get; set; }
@@ -17,12 +17,12 @@ public class Program
     {
         // Elasticsearch bağlantısı için gerekli ayarlar
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("trendyol"); // Varsayılan indeks ismi 'products' olarak ayarlandı
+            .DefaultIndex("trendyol1"); // Varsayılan indeks ismi 'products' olarak ayarlandı
 
         var client = new ElasticClient(settings);
 
         // Web scraping için kullanacağımız URL
-        var url = "https://www.trendyol.com"; // Örnek olarak Trendyol ana sayfası
+        var url = "https://www.trendyol.com/hc-care/complex-bitkisel-sac-bakim-kompleksi-100-ml-p-7103578?boutiqueId=61&merchantId=110268&sav=true"; // Örnek olarak Trendyol ana sayfası
 
         var httpClient = new HttpClient();
         var html = await httpClient.GetStringAsync(url);
@@ -33,21 +33,24 @@ public class Program
 
         // HTML belgesinde istediğimiz verileri seçmek için XPath veya CSS seçicilerini kullanın
         // Bu örnekte, ürün başlıklarını ve açıklamalarını çekiyoruz
-        var productNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='p-card-wrppr']");
+        var productNodes = htmlDocument.DocumentNode.SelectNodes("//h1[@class='pr-new-br']");
 
         var products = new List<Product>();
 
         foreach (var node in productNodes)
         {
-            var titleNode = node.SelectSingleNode(".//span[@class='prdct-desc-cntnr-name']");
-            var descriptionNode = node.SelectSingleNode(".//span[@class='prdct-desc-cntnr-ttl']");
+            var titleNode = node.SelectSingleNode(".//a[@class='product-brand-name-with-link']");
+            var titleSpan = node.SelectSingleNode(".//span");
 
-            if (titleNode != null && descriptionNode != null)
+            if (titleNode != null && titleSpan != null)
             {
+                // Ürün açıklamalarını bulmak için ilgili bölümdeki XPath ifadesi
+                var descriptionNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='marketing-product-detail-seo-content']//div[@class='product-detail-seo-content']//div[@class='seo-content-wrapper']//div[@class='seo-content']//section//div//div//p");
+
                 var product = new Product
                 {
-                    Title = titleNode.InnerText.Trim(),
-                    Description = descriptionNode.InnerText.Trim()
+                    Title = $"{titleNode.InnerText.Trim()} {titleSpan.InnerText.Trim()}",
+                    Description = descriptionNode?.InnerText.Trim()
                 };
 
                 products.Add(product);
