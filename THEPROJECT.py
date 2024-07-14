@@ -50,9 +50,9 @@ index_data('products', 'product', data)
 
 # Kullanıcı verilerini simüle etme
 user_data = {
-    'user_id': [1, 2, 3, 1, 2, 3],
-    'search_query': ['laptop', 'phone', 'laptop', 'headphones', 'phone', 'shoes'],
-    'click_product': [101, 102, 103, 101, 104, 105]
+    'user_id': [1, 2, 3, 11, 22, 33],
+    'search_query': ['laptop', 'phone', 'shirt', 'headphones', 'chair', 'shoes'],
+    'click_product': [101, 102, 103, 104, 105, 106]
 }
 
 # Veriyi bir Pandas DataFrame'e dönüştürme
