@@ -17,7 +17,7 @@ public class Program
     {
         // Elasticsearch bağlantısı için gerekli ayarlar
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("products"); // Varsayılan indeks ismi 'products' olarak ayarlandı
+            .DefaultIndex("trendyol"); // Varsayılan indeks ismi 'products' olarak ayarlandı
 
         var client = new ElasticClient(settings);
 
