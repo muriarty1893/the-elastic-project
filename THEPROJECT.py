@@ -10,13 +10,32 @@ from tensorflow.keras.layers import Dense
 def scrape_website(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
-    title = soup.find('h1').text if soup.find('h1') else 'No Title'
-    description = soup.find('p').text if soup.find('p') else 'No Description'
-    tags = [tag.text for tag in soup.find_all('a', class_='tag')]
-    return {'title': title, 'description': description, 'tags': tags}
+    
+    # Ürün başlığını çekme (HTML yapısına göre değiştirilmesi gerekebilir)
+    # Örneğin: <h1 class="product-title">Başlık</h1>
+    title = soup.find('h1', class_='pr-new-br').text if soup.find('h1', class_='pr-new-br') else 'No Title'
+    
+    # Ürün açıklamasını çekme (HTML yapısına göre değiştirilmesi gerekebilir)
+    # Örneğin: <div class="product-description">Açıklama</div>
+    description = soup.find('div', class_='seo-content').text if soup.find('div', class_='seo-content') else 'No Description'
+    
+    # Ürün etiketlerini çekme (HTML yapısına göre değiştirilmesi gerekebilir)
+    # Örneğin: <a class="tag">Etiket</a>
+    #tags = [tag.text for tag in soup.find_all('a', class_='tag')]
+    
+    # Kullanıcı yorumlarını çekme (HTML yapısına göre değiştirilmesi gerekebilir)
+    # Örneğin: <div class="comment-text">Yorum</div>
+    #comments = [comment.text for comment in soup.find_all('div', class_='comment-text')]
+    
+    return {
+        'title': title,
+        'description': description,
+        #'tags': tags,
+        #'comments': comments
+    }
 
-# Örnek bir URL'den veri çekme
-url = 'https://www.example.com/news_article'
+# Örnek bir URL'den veri çekme (Trendyol ürün sayfası)
+url = 'https://www.trendyol.com/hc-care/complex-bitkisel-sac-bakim-kompleksi-100-ml-p-7103578?boutiqueId=61&merchantId=110268&sav=true'
 data = scrape_website(url)
 print(data)
 
@@ -27,13 +46,13 @@ def index_data(index_name, doc_type, data):
     es.index(index=index_name, doc_type=doc_type, body=data)
 
 # Toplanan veriyi Elasticsearch'e indeksleme
-index_data('news', 'article', data)
+index_data('products', 'product', data)
 
 # Kullanıcı verilerini simüle etme
 user_data = {
     'user_id': [1, 2, 3, 1, 2, 3],
-    'search_query': ['technology', 'health', 'technology', 'science', 'health', 'sports'],
-    'click_article': [101, 102, 103, 101, 104, 105]
+    'search_query': ['laptop', 'phone', 'laptop', 'headphones', 'phone', 'shoes'],
+    'click_product': [101, 102, 103, 101, 104, 105]
 }
 
 # Veriyi bir Pandas DataFrame'e dönüştürme
@@ -47,10 +66,10 @@ train = df_encoded.sample(frac=0.8, random_state=0)
 test = df_encoded.drop(train.index)
 
 # Giriş (X) ve çıkış (y) değişkenlerini ayırma
-X_train = train.drop(['user_id', 'click_article'], axis=1)
-y_train = train['click_article']
-X_test = test.drop(['user_id', 'click_article'], axis=1)
-y_test = test['click_article']
+X_train = train.drop(['user_id', 'click_product'], axis=1)
+y_train = train['click_product']
+X_test = test.drop(['user_id', 'click_product'], axis=1)
+y_test = test['click_product']
 
 # Modeli oluşturma
 model = Sequential([
@@ -70,18 +89,18 @@ loss = model.evaluate(X_test, y_test)
 print(f'Test Loss: {loss}')
 
 # Öneri sistemi
-def recommend_articles(user_search_query):
+def recommend_products(user_search_query):
     user_query_encoded = pd.get_dummies(pd.DataFrame({'search_query': [user_search_query]}))
     missing_cols = set(X_train.columns) - set(user_query_encoded.columns)
     for col in missing_cols:
         user_query_encoded[col] = 0
     user_query_encoded = user_query_encoded[X_train.columns]
-    predicted_article = model.predict(user_query_encoded)
-    article_id = int(predicted_article[0][0])
-    result = es.get(index='news', doc_type='article', id=article_id)
+    predicted_product = model.predict(user_query_encoded)
+    product_id = int(predicted_product[0][0])
+    result = es.get(index='products', doc_type='product', id=product_id)
     return result['_source']
 
 # Kullanıcıya öneri sunma
-user_search_query = 'technology'
-recommended_article = recommend_articles(user_search_query)
-print(recommended_article)
+user_search_query = 'laptop'
+recommended_product = recommend_products(user_search_query)
+print(recommended_product)
