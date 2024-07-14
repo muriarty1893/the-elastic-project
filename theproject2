@@ -1,0 +1,69 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using HtmlAgilityPack;
+using Nest;
+
+// Bu sınıf ürün/haber bilgilerini tutmak için kullanılır
+public class Product
+{
+    public string Title { get; set; }
+    public string Description { get; set; }
+}
+
+public class Program
+{
+    static async System.Threading.Tasks.Task Main(string[] args)
+    {
+        // Elasticsearch bağlantısı için gerekli ayarlar
+        var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
+            .DefaultIndex("products"); // Varsayılan indeks ismi 'products' olarak ayarlandı
+
+        var client = new ElasticClient(settings);
+
+        // Web scraping için kullanacağımız URL
+        var url = "https://www.trendyol.com"; // Örnek olarak Trendyol ana sayfası
+
+        var httpClient = new HttpClient();
+        var html = await httpClient.GetStringAsync(url);
+
+        // HtmlAgilityPack kullanarak HTML belgesini yükle
+        var htmlDocument = new HtmlDocument();
+        htmlDocument.LoadHtml(html);
+
+        // HTML belgesinde istediğimiz verileri seçmek için XPath veya CSS seçicilerini kullanın
+        // Bu örnekte, ürün başlıklarını ve açıklamalarını çekiyoruz
+        var productNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='p-card-wrppr']");
+
+        var products = new List<Product>();
+
+        foreach (var node in productNodes)
+        {
+            var titleNode = node.SelectSingleNode(".//span[@class='prdct-desc-cntnr-name']");
+            var descriptionNode = node.SelectSingleNode(".//span[@class='prdct-desc-cntnr-ttl']");
+
+            if (titleNode != null && descriptionNode != null)
+            {
+                var product = new Product
+                {
+                    Title = titleNode.InnerText.Trim(),
+                    Description = descriptionNode.InnerText.Trim()
+                };
+
+                products.Add(product);
+            }
+        }
+
+        // Çekilen verileri Elasticsearch'e indekslemek için
+        var indexResponse = client.IndexMany(products);
+
+        if (indexResponse.Errors)
+        {
+            Console.WriteLine("Bazı veriler indekslenirken hata oluştu.");
+        }
+        else
+        {
+            Console.WriteLine("Veriler başarıyla indekslendi.");
+        }
+    }
+}
