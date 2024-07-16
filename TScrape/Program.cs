@@ -18,11 +18,11 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("weeee");
+            .DefaultIndex("weeeeeee");
         return new ElasticClient(settings);
     }
 
-    private static async Task<List<Product>> ScrapeTrendyolAsync()
+    private static async Task<List<Product>> ScrapeWebAsync()
     {
         var url = "https://cumbakuruyemis.com/Kategori";
         var httpClient = new HttpClient();
@@ -52,24 +52,42 @@ public class Program
 
     private static void IndexProducts(ElasticClient client, List<Product> products, ILogger logger)
     {
-        // Elasticsearch'e ürünleri indeksler.
+        // Elasticsearch'e ürünleri indeksler, eğer daha önce eklenmemişlerse.
         foreach (var product in products)
         {
-            var response = client.IndexDocument(product);
-            if (!response.IsValid)
+            // Ürünün zaten indekslenip indekslenmediğini kontrol eder
+            var searchResponse = client.Search<Product>(s => s
+                .Query(q => q
+                    .Term(t => t
+                        .Field(f => f.ProductName)
+                        .Value(product.ProductName)
+                    )
+                )
+            );
+
+            if (searchResponse.Documents.Count == 0)
             {
-                logger.LogError($"Error indexing product: {product.ProductName}, Reason: {response.ServerError}");
+                var response = client.IndexDocument(product);
+                if (!response.IsValid)
+                {
+                    logger.LogError($"Error indexing product: {product.ProductName}, Reason: {response.ServerError}");
+                }
+            }
+            else
+            {
+                logger.LogInformation($"Product already indexed: {product.ProductName}");
             }
         }
     }
 
+
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("weeee");
+        var indexExistsResponse = client.Indices.Exists("weeeeeee");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("weeee", c => c
+            var createIndexResponse = client.Indices.Create("weeeeeee", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -106,7 +124,7 @@ public class Program
 
         Console.WriteLine("Results:\n--------------------------------------------");
         int counter = 0; // 
-        int x = 5; // çıktıda gösterilecek sonuç sayısı
+        int x = 10; // çıktıda gösterilecek sonuç sayısı
         foreach (var product in searchResponse.Documents)
         {
             if (counter >= x) { break; } // En fazla x ürünü yazdırması için.
@@ -132,8 +150,8 @@ public class Program
 
         CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 
-        var products = await ScrapeTrendyolAsync(); // Trendyol web sitesinden ürünleri çeker
-
+        var products = await ScrapeWebAsync(); // Web sitesinden ürünleri çeker
+        
         IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
         
         stopwatch.Start();
