@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Security.AccessControl;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,10 +8,11 @@ using Nest;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
+using System.Diagnostics;
 
 public class Product
 {
-    public string ProductName { get; set; }
+    public string? ProductName { get; set; }
 }
 
 public class Program
@@ -142,7 +144,7 @@ public class Program
         IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
 
         stopwatch.Start();
-        SearchProducts(client, "icecek", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "Erkek", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
