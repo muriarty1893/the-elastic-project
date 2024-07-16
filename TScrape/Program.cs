@@ -27,31 +27,26 @@ public class Program
 
     private static async Task<List<Product>> ScrapeTrendyolAsync()
     {
-        var url = "https://cumbakuruyemis.com/";
+        var url = "https://cumbakuruyemis.com/Kategori";
         var httpClient = new HttpClient();
         var html = await httpClient.GetStringAsync(url);
 
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
 
-        var productNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='productGridName']");
+        // Güncellenmiş XPath ifadesi
+        var productNodes = htmlDocument.DocumentNode.SelectNodes("//a[@class='text-decoration-none textBlack']");
         var products = new List<Product>();
 
         if (productNodes != null)
         {
             foreach (var node in productNodes)
             {
-                var titleNode = node.SelectSingleNode(".//a[@class='product-brand-name-with-link']");
-                var titleSpan = node.SelectSingleNode(".//span");
-
-                if (titleNode != null && titleSpan != null)
+                var product = new Product
                 {
-                    var product = new Product
-                    {
-                        ProductName = $"{titleNode.InnerText.Trim()} {titleSpan.InnerText.Trim()}"
-                    };
-                    products.Add(product);
-                }
+                    ProductName = node.InnerText.Trim()
+                };
+                products.Add(product);
             }
         }
 
@@ -144,7 +139,7 @@ public class Program
         IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
 
         stopwatch.Start();
-        SearchProducts(client, "Erkek", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "JUMBO", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
