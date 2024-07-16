@@ -21,7 +21,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("weeeeeeeeeeeeeeeeeeeeeeee");
+            .DefaultIndex("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
         return new ElasticClient(settings);
     }
 
@@ -63,7 +63,6 @@ public class Program
             var products = await ScrapePageAsync(url);
             allProducts.AddRange(products);
         }
-
         return allProducts;
     }
 
@@ -79,10 +78,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("weeeeeeeeeeeeeeeeeeeeeeee");
+        var indexExistsResponse = client.Indices.Exists("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("weeeeeeeeeeeeeeeeeeeeeeee", c => c
+            var createIndexResponse = client.Indices.Create("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -147,7 +146,7 @@ public class Program
 
         var products = await ScrapeAllPagesAsync(); // Web sitesinden tüm sayfalardaki ürünleri çeker
         
-        const string flagFilePath = "flags/indexing_done5.flag"; // Dosya oluşturmak için
+        const string flagFilePath = "flags/indexing_done8.flag"; // Dosya oluşturmak için
         
         if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
         {
@@ -157,7 +156,7 @@ public class Program
         else { logger.LogInformation("Products have already been indexed."); }
         
         stopwatch.Start();
-        SearchProducts(client, "TARZAN", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "ET KEBAP BAHARATI", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
