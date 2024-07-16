@@ -1,14 +1,15 @@
-﻿using System.IO;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Nest;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
-using System.Diagnostics;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using System.IO;
 
 public class Product
 {
@@ -19,23 +20,20 @@ public class Program
 {
     private static ElasticClient CreateElasticClient()
     {
-        // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+            .DefaultIndex("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
         return new ElasticClient(settings);
     }
 
-    private static async Task<List<Product>> ScrapePageAsync(string url)
+    private static List<Product> ScrapeProductsFromPage(IWebDriver driver)
     {
-        var httpClient = new HttpClient();
-        var html = await httpClient.GetStringAsync(url);
+        var products = new List<Product>();
 
+        var html = driver.PageSource;
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
 
-        // XPath ifadesi
         var productNodes = htmlDocument.DocumentNode.SelectNodes("//a[@class='text-decoration-none textBlack']");
-        var products = new List<Product>();
 
         if (productNodes != null)
         {
@@ -54,21 +52,37 @@ public class Program
 
     private static async Task<List<Product>> ScrapeAllPagesAsync()
     {
-        var baseUrl = "https://cumbakuruyemis.com/Kategori?page=";
         var allProducts = new List<Product>();
 
-        for (int pageNumber = 1; pageNumber <= 19; pageNumber++)
+        var options = new ChromeOptions();
+        options.AddArgument("--headless"); // Tarayıcıyı arka planda çalıştırır
+        using (var driver = new ChromeDriver(options))
         {
-            var url = $"{baseUrl}{pageNumber}";
-            var products = await ScrapePageAsync(url);
-            allProducts.AddRange(products);
+            driver.Navigate().GoToUrl("https://cumbakuruyemis.com/Kategori");
+
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.FindElement(By.ClassName("categoryNavigationButtons")));
+
+            for (int pageNumber = 1; pageNumber <= 19; pageNumber++)
+            {
+                if (pageNumber > 1)
+                {
+                    var nextPageButton = driver.FindElement(By.XPath($"//a[@onclick='updatePage({pageNumber})']"));
+                    nextPageButton.Click();
+
+                    wait.Until(d => d.FindElement(By.ClassName("categoryNavigationButtons")));
+                }
+
+                var products = ScrapeProductsFromPage(driver);
+                allProducts.AddRange(products);
+            }
         }
+
         return allProducts;
     }
 
     private static void IndexProducts(ElasticClient client, List<Product> products, ILogger logger)
     {
-        // Elasticsearch'e ürünleri indeksler.
         foreach (var product in products)
         {
             var response = client.IndexDocument(product);
@@ -77,11 +91,10 @@ public class Program
 
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
-        // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        var indexExistsResponse = client.Indices.Exists("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", c => c
+            var createIndexResponse = client.Indices.Create("weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -94,19 +107,18 @@ public class Program
 
     private static void SearchProducts(ElasticClient client, string searchText, ILogger logger)
     {
-        // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
         var searchResponse = client.Search<Product>(s => s
             .Query(q => q
                 .MultiMatch(mm => mm
                     .Query(searchText)
                     .Fields(f => f
-                        .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
+                        .Field(p => p.ProductName, 3.0)
                     )
-                    .Fuzziness(Fuzziness.Auto) // Otomatik bulanıklık ayarı.
+                    .Fuzziness(Fuzziness.Auto)
                 )
             )
             .Sort(srt => srt
-                .Descending(SortSpecialField.Score) // Sonuçları puan sırasına göre sıralar.
+                .Descending(SortSpecialField.Score)
             )
         );
 
@@ -117,11 +129,11 @@ public class Program
         }
 
         Console.WriteLine("Results:\n--------------------------------------------");
-        int counter = 0; // 
-        int x = 10; // çıktıda gösterilecek sonuç sayısı
+        int counter = 0;
+        int x = 10;
         foreach (var product in searchResponse.Documents)
         {
-            if (counter >= x) { break; } // En fazla x ürünü yazdırması için.
+            if (counter >= x) { break; }
             Console.WriteLine($"Product: {product.ProductName}\n--------------------------------------------");
             counter++;
         }
@@ -130,7 +142,6 @@ public class Program
 
     public static async Task Main(string[] args)
     {
-        // Logger kurulumu
         using var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
@@ -138,25 +149,24 @@ public class Program
         });
         var logger = loggerFactory.CreateLogger<Program>();
 
-        Stopwatch stopwatch = new Stopwatch(); // Zamanlayıcı oluşturur
+        var client = CreateElasticClient();
 
-        var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
+        CreateIndexIfNotExists(client, logger);
 
-        CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
+        var products = await ScrapeAllPagesAsync();
 
-        var products = await ScrapeAllPagesAsync(); // Web sitesinden tüm sayfalardaki ürünleri çeker
-        
-        const string flagFilePath = "flags/indexing_done8.flag"; // Dosya oluşturmak için
-        
-        if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
+        const string flagFilePath = "flags/indexing_done9.flag";
+
+        if (!File.Exists(flagFilePath))
         {
-            IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
-            File.Create(flagFilePath).Dispose(); // Dosya oluşturularak indekslemenin yapıldığını işaretler
-        } 
+            IndexProducts(client, products, logger);
+            File.Create(flagFilePath).Dispose();
+        }
         else { logger.LogInformation("Products have already been indexed."); }
-        
+
+        var stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
-        SearchProducts(client, "ET KEBAP BAHARATI", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "TARZAN", logger);
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
