@@ -10,10 +10,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
 using System.Diagnostics;
 
-public class Product
-{
-    public string? ProductName { get; set; }
-}
+public class Product{ public string? ProductName { get; set; } }
 
 public class Program
 {
@@ -34,7 +31,7 @@ public class Program
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
 
-        // Güncellenmiş XPath ifadesi
+        // XPath ifadesi
         var productNodes = htmlDocument.DocumentNode.SelectNodes("//a[@class='text-decoration-none textBlack']");
         var products = new List<Product>();
 
