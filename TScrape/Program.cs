@@ -12,8 +12,8 @@ using System.Diagnostics;
 public class Product // Info about product
 {
     public string? ProductName { get; set; }
-    public List<string>? Prices { get; set; }
-    public List<string>? Quantities { get; set; }
+    public List<string>? Prices { get; set; } // TL
+    public List<string>? Quantities { get; set; } // gram
 }
 
 public class Program
