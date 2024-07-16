@@ -10,7 +10,10 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
 using System.Diagnostics;
 
-public class Product{ public string? ProductName { get; set; } }
+public class Product{ 
+    public string? ProductName { get; set; }
+    public string? Price { get; set; }
+}
 
 public class Program
 {
@@ -18,7 +21,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("we");
+            .DefaultIndex("cumbaku");
         return new ElasticClient(settings);
     }
 
@@ -62,10 +65,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("we");
+        var indexExistsResponse = client.Indices.Exists("cumbaku");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("we", c => c
+            var createIndexResponse = client.Indices.Create("cumbaku", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -130,14 +133,13 @@ public class Program
 
         var products = await ScrapeWebAsync(); // Web sitesinden ürünleri çeker
         
-        const string flagFilePath = "flags/indexing_done11.flag"; // Dosya oluşturmak için
+        const string flagFilePath = "flags/indexing_done13.flag"; // Dosya oluşturmak için
         
         if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
         {
             IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
             File.Create(flagFilePath).Dispose(); // Dosya oluşturularak indekslemenin yapıldığını işaretler
         } 
-        else { logger.LogInformation("Products have already been indexed."); }
         
         stopwatch.Start();
         SearchProducts(client, "TARZAN", logger); // Elasticsearch'te girilen kelimeyi arar
