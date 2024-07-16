@@ -27,14 +27,14 @@ public class Program
 
     private static async Task<List<Product>> ScrapeTrendyolAsync()
     {
-        var url = "https://www.trendyol.com/gezer/erkek-siyah-beyaz-rahat-taban-lux-banyo-havuz-plaj-terlik-p-99258600?boutiqueId=61&merchantId=141253&sav=true";
+        var url = "https://cumbakuruyemis.com/";
         var httpClient = new HttpClient();
         var html = await httpClient.GetStringAsync(url);
 
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
 
-        var productNodes = htmlDocument.DocumentNode.SelectNodes("//h1[@class='pr-new-br']");
+        var productNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='productGridName']");
         var products = new List<Product>();
 
         if (productNodes != null)
