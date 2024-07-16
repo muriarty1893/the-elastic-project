@@ -18,7 +18,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("cumba");
+            .DefaultIndex("weeee");
         return new ElasticClient(settings);
     }
 
@@ -66,10 +66,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("cumba");
+        var indexExistsResponse = client.Indices.Exists("weeee");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("cumba", c => c
+            var createIndexResponse = client.Indices.Create("weeee", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -133,10 +133,11 @@ public class Program
         CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 
         var products = await ScrapeTrendyolAsync(); // Trendyol web sitesinden ürünleri çeker
-        IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
 
+        IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
+        
         stopwatch.Start();
-        SearchProducts(client, "JUMBO", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, "TARZAN", logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
