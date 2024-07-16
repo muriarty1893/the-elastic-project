@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
 using System.Diagnostics;
 
-public class Product
+public class Product // Info about product
 {
     public string? ProductName { get; set; }
     public List<string>? Prices { get; set; }
@@ -28,7 +28,7 @@ public class Program
 
     private static async Task<List<Product>> ScrapeWebAsync()
     {
-        var url = "https://cumbakuruyemis.com/Kategori";
+        var url = "https://cumbakuruyemis.com/Kategori"; // Website we pull data -------------------------------
         var httpClient = new HttpClient();
         var products = new List<Product>();
 
@@ -154,7 +154,7 @@ public class Program
                     Console.WriteLine($"Price: {price}");
                 }
             }
-            if (product.Quantities != null)
+            if (product.Quantities != null) // printing quantity info
             {
                 foreach (var quantity in product.Quantities)
                 {
@@ -192,9 +192,9 @@ public class Program
             IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
             File.Create(flagFilePath).Dispose(); // Dosya oluşturularak indekslemenin yapıldığını işaretler
         } 
-        
+        var item = "badem" ; // user input ----------------------------------------------------------------
         stopwatch.Start();
-        SearchProducts(client, "nohut", logger); // Elasticsearch'te girilen kelimeyi arar
+        SearchProducts(client, item, logger); // Elasticsearch'te girilen kelimeyi arar
         stopwatch.Stop();
 
         Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
