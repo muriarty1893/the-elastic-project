@@ -99,9 +99,8 @@ public class Program
         }
     }
 
-    private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
+    private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger) // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
     {
-        // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
         var indexExistsResponse = client.Indices.Exists("cumbakuruyemissss");
         if (!indexExistsResponse.Exists)
         {
@@ -116,9 +115,8 @@ public class Program
         }
     }
 
-    private static void SearchProducts(ElasticClient client, string searchText, ILogger logger)
+    private static void SearchProducts(ElasticClient client, string searchText, ILogger logger) // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
     {
-        // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
         var searchResponse = client.Search<Product>(s => s
             .Query(q => q
                 .MultiMatch(mm => mm
@@ -141,7 +139,7 @@ public class Program
         }
 
         Console.WriteLine("Results:\n--------------------------------------------");
-        int counter = 0; // 
+        int counter = 0;
         int x = 10; // çıktıda gösterilecek sonuç sayısı
         foreach (var product in searchResponse.Documents)
         {
