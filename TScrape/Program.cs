@@ -22,7 +22,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("cumbakuruyemise");
+            .DefaultIndex("cumbakuruyemiss");
         return new ElasticClient(settings);
     }
 
@@ -54,7 +54,7 @@ public class Program
                         prices.Add(priceNode.InnerText.Trim());
                     }
                 }
-                
+
                 var quantities = new List<string>();
                 if (quantityNodes != null)
                 {
@@ -67,7 +67,8 @@ public class Program
                 var product = new Product
                 {
                     ProductName = productNameNode?.InnerText.Trim(),
-                    Prices = prices
+                    Prices = prices,
+                    Quantities = quantities
                 };
 
                 products.Add(product);
@@ -89,10 +90,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("cumbakuruyemise");
+        var indexExistsResponse = client.Indices.Exists("cumbakuruyemiss");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("cumbakuruyemise", c => c
+            var createIndexResponse = client.Indices.Create("cumbakuruyemiss", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
