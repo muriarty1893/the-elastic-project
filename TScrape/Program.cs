@@ -10,7 +10,10 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
 using System.Diagnostics;
 
-public class Product{ public string? ProductName { get; set; } }
+public class Product
+{
+    public string? ProductName { get; set; }
+}
 
 public class Program
 {
@@ -22,9 +25,8 @@ public class Program
         return new ElasticClient(settings);
     }
 
-    private static async Task<List<Product>> ScrapeWebAsync()
+    private static async Task<List<Product>> ScrapePageAsync(string url)
     {
-        var url = "https://cumbakuruyemis.com/Kategori";
         var httpClient = new HttpClient();
         var html = await httpClient.GetStringAsync(url);
 
@@ -48,6 +50,21 @@ public class Program
         }
 
         return products;
+    }
+
+    private static async Task<List<Product>> ScrapeAllPagesAsync()
+    {
+        var baseUrl = "https://cumbakuruyemis.com/Kategori?page=";
+        var allProducts = new List<Product>();
+
+        for (int pageNumber = 1; pageNumber <= 19; pageNumber++)
+        {
+            var url = $"{baseUrl}{pageNumber}";
+            var products = await ScrapePageAsync(url);
+            allProducts.AddRange(products);
+        }
+
+        return allProducts;
     }
 
     private static void IndexProducts(ElasticClient client, List<Product> products, ILogger logger)
@@ -128,7 +145,7 @@ public class Program
 
         CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 
-        var products = await ScrapeWebAsync(); // Web sitesinden ürünleri çeker
+        var products = await ScrapeAllPagesAsync(); // Web sitesinden tüm sayfalardaki ürünleri çeker
         
         const string flagFilePath = "flags/indexing_done5.flag"; // Dosya oluşturmak için
         
