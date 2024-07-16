@@ -135,13 +135,9 @@ public class Program
         if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
         {
             IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
-
-            // Dosya oluşturularak indekslemenin yapıldığını işaretler
-            File.Create(flagFilePath).Dispose();
-        } else
-        {
-            logger.LogInformation("Products have already been indexed.");
-        }
+            File.Create(flagFilePath).Dispose(); // Dosya oluşturularak indekslemenin yapıldığını işaretler
+        } 
+        else { logger.LogInformation("Products have already been indexed."); }
         
         stopwatch.Start();
         SearchProducts(client, "TARZAN", logger); // Elasticsearch'te girilen kelimeyi arar
