@@ -162,7 +162,7 @@ public class Program
             Console.WriteLine("--------------------------------------------");
             counter++;
         }
-        Console.WriteLine(searchResponse.Documents.Count + " matchup");
+        Console.WriteLine(searchResponse.Documents.Count + " match(es).");
     }
 
     public static async Task Main(string[] args)
