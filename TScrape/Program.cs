@@ -21,7 +21,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("wee");
+            .DefaultIndex("cumba");
         return new ElasticClient(settings);
     }
 
@@ -74,10 +74,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("products");
+        var indexExistsResponse = client.Indices.Exists("cumba");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("products", c => c
+            var createIndexResponse = client.Indices.Create("cumba", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
