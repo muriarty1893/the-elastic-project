@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,7 +9,11 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
 using System.Diagnostics;
 
-public class Product{ public string? ProductName { get; set; } }
+public class Product
+{
+    public string? ProductName { get; set; }
+    public List<string>? Prices { get; set; }
+}
 
 public class Program
 {
@@ -18,7 +21,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("cumbakuru");
+            .DefaultIndex("cumbakuruye");
         return new ElasticClient(settings);
     }
 
@@ -31,18 +34,31 @@ public class Program
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
 
-        // XPath ifadesi
-        var productNodes = htmlDocument.DocumentNode.SelectNodes("//a[@class='text-decoration-none textBlack']");
+        var productNodes = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class, 'col-xl-4 col-lg-6 col-md-6 mt-4')]");
         var products = new List<Product>();
 
         if (productNodes != null)
         {
             foreach (var node in productNodes)
             {
+                var productNameNode = node.SelectSingleNode(".//a[@class='text-decoration-none textBlack']");
+                var priceNodes = node.SelectNodes(".//div[contains(@class, 'newPrice')]");
+
+                var prices = new List<string>();
+                if (priceNodes != null)
+                {
+                    foreach (var priceNode in priceNodes)
+                    {
+                        prices.Add(priceNode.InnerText.Trim());
+                    }
+                }
+
                 var product = new Product
                 {
-                    ProductName = node.InnerText.Trim()
+                    ProductName = productNameNode?.InnerText.Trim(),
+                    Prices = prices
                 };
+
                 products.Add(product);
             }
         }
@@ -62,10 +78,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("cumbakuru");
+        var indexExistsResponse = client.Indices.Exists("cumbakuruye");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("cumbakuru", c => c
+            var createIndexResponse = client.Indices.Create("cumbakuruye", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -106,7 +122,15 @@ public class Program
         foreach (var product in searchResponse.Documents)
         {
             if (counter >= x) { break; } // En fazla x ürünü yazdırması için.
-            Console.WriteLine($"Product: {product.ProductName}\n--------------------------------------------");
+            Console.WriteLine($"Product: {product.ProductName}");
+            if (product.Prices != null)
+            {
+                foreach (var price in product.Prices)
+                {
+                    Console.WriteLine($"Price: {price}");
+                }
+            }
+            Console.WriteLine("--------------------------------------------");
             counter++;
         }
         Console.WriteLine(searchResponse.Documents.Count + " matchup");
@@ -130,10 +154,10 @@ public class Program
 
         var products = await ScrapeWebAsync(); // Web sitesinden ürünleri çeker
         
-        const string flagFilePath = "flags/indexing_done_14.flag"; // Dosya oluşturmak için
+        const string flagFilePath = "flags/indexing_done_15.flag"; // Dosya oluşturmak için
         
         if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
-        {
+        {   
             IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
             File.Create(flagFilePath).Dispose(); // Dosya oluşturularak indekslemenin yapıldığını işaretler
         } 
