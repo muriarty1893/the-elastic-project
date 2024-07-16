@@ -18,7 +18,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("weeeeeeeeeeeeeeeeeeeeeeee");
+            .DefaultIndex("w");
         return new ElasticClient(settings);
     }
 
@@ -62,10 +62,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("weeeeeeeeeeeeeeeeeeeeeeee");
+        var indexExistsResponse = client.Indices.Exists("w");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("weeeeeeeeeeeeeeeeeeeeeeee", c => c
+            var createIndexResponse = client.Indices.Create("w", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -130,7 +130,7 @@ public class Program
 
         var products = await ScrapeWebAsync(); // Web sitesinden ürünleri çeker
         
-        const string flagFilePath = "flags/indexing_done5.flag"; // Dosya oluşturmak için
+        const string flagFilePath = "flags/indexing_done10.flag"; // Dosya oluşturmak için
         
         if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
         {
