@@ -64,6 +64,10 @@
             "NEST": {
               "target": "Package",
               "version": "[7.17.5, )"
+            },
+            "Selenium.WebDriver": {
+              "target": "Package",
+              "version": "[4.22.0, )"
             }
           },
           "imports": [

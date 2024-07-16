@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
     <PackageReference Include="NEST" Version="7.17.5" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.22.0" />
   </ItemGroup>
 
 </Project>

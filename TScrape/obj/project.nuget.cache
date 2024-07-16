@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "TSyBk6CaJEg=",
+  "dgSpecHash": "SPaJ4XOeJBE=",
   "success": true,
   "projectFilePath": "C:\\Users\\Murat Eker\\Desktop\\the project\\TScrape\\TScrape.csproj",
   "expectedPackageFiles": [
@@ -21,6 +21,8 @@
     "C:\\Users\\Murat Eker\\.nuget\\packages\\microsoft.extensions.options.configurationextensions\\8.0.0\\microsoft.extensions.options.configurationextensions.8.0.0.nupkg.sha512",
     "C:\\Users\\Murat Eker\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
     "C:\\Users\\Murat Eker\\.nuget\\packages\\nest\\7.17.5\\nest.7.17.5.nupkg.sha512",
+    "C:\\Users\\Murat Eker\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\Murat Eker\\.nuget\\packages\\selenium.webdriver\\4.22.0\\selenium.webdriver.4.22.0.nupkg.sha512",
     "C:\\Users\\Murat Eker\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Murat Eker\\.nuget\\packages\\system.diagnostics.diagnosticsource\\5.0.0\\system.diagnostics.diagnosticsource.5.0.0.nupkg.sha512",
     "C:\\Users\\Murat Eker\\.nuget\\packages\\system.text.encodings.web\\8.0.0\\system.text.encodings.web.8.0.0.nupkg.sha512",

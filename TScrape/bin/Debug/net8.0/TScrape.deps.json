@@ -12,7 +12,8 @@
           "Microsoft.Extensions.Logging": "8.0.0",
           "Microsoft.Extensions.Logging.Console": "8.0.0",
           "Microsoft.Extensions.Logging.Debug": "8.0.0",
-          "NEST": "7.17.5"
+          "NEST": "7.17.5",
+          "Selenium.WebDriver": "4.22.0"
         },
         "runtime": {
           "TScrape.dll": {}
@@ -210,6 +211,25 @@
           }
         }
       },
+      "Newtonsoft.Json/13.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.1.25517"
+          }
+        }
+      },
+      "Selenium.WebDriver/4.22.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
+        },
+        "runtime": {
+          "lib/netstandard2.0/WebDriver.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.0.0.0"
+          }
+        }
+      },
       "System.Buffers/4.5.1": {},
       "System.Diagnostics.DiagnosticSource/5.0.0": {},
       "System.Text.Encodings.Web/8.0.0": {},
@@ -344,6 +364,20 @@
       "sha512": "sha512-bo9UyuIoVRx4IUQiuC8ZrlZuvAXKIccernC7UUKukQCEmRq2eVIk+gubHlnMQljrP51q0mN4cjgy9vv5uZPkoA==",
       "path": "nest/7.17.5",
       "hashPath": "nest.7.17.5.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A==",
+      "path": "newtonsoft.json/13.0.1",
+      "hashPath": "newtonsoft.json.13.0.1.nupkg.sha512"
+    },
+    "Selenium.WebDriver/4.22.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-t2ZzGjpA85tIfk820howgg4r0bkelA4MiulUdqIcewgKPlznHenp4MczaX0tXXmjbRRTbMcRPA+JfnxFoE47AQ==",
+      "path": "selenium.webdriver/4.22.0",
+      "hashPath": "selenium.webdriver.4.22.0.nupkg.sha512"
     },
     "System.Buffers/4.5.1": {
       "type": "package",
