@@ -13,6 +13,7 @@ public class Product
 {
     public string? ProductName { get; set; }
     public List<string>? Prices { get; set; }
+    public List<string>? Quantities { get; set; }
 }
 
 public class Program
@@ -21,7 +22,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("cumbakuruyemis");
+            .DefaultIndex("cumbakuruyemise");
         return new ElasticClient(settings);
     }
 
@@ -43,6 +44,7 @@ public class Program
             {
                 var productNameNode = node.SelectSingleNode(".//a[@class='text-decoration-none textBlack']");
                 var priceNodes = node.SelectNodes(".//div[contains(@class, 'newPrice')]");
+                var quantityNodes = node.SelectNodes(".//span[contains(@class, 'productQuantityText')]");
 
                 var prices = new List<string>();
                 if (priceNodes != null)
@@ -50,6 +52,15 @@ public class Program
                     foreach (var priceNode in priceNodes)
                     {
                         prices.Add(priceNode.InnerText.Trim());
+                    }
+                }
+                
+                var quantities = new List<string>();
+                if (quantityNodes != null)
+                {
+                    foreach (var quantityNode in quantityNodes)
+                    {
+                        quantities.Add(quantityNode.InnerText.Trim());
                     }
                 }
 
@@ -78,10 +89,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("cumbakuruyemis");
+        var indexExistsResponse = client.Indices.Exists("cumbakuruyemise");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("cumbakuruyemis", c => c
+            var createIndexResponse = client.Indices.Create("cumbakuruyemise", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -154,7 +165,7 @@ public class Program
 
         var products = await ScrapeWebAsync(); // Web sitesinden ürünleri çeker
         
-        const string flagFilePath = "flags/indexing_done_17.flag"; // Dosya oluşturmak için
+        const string flagFilePath = "flags/indexing_done_18.flag"; // Dosya oluşturmak için
         
         if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
         {   
