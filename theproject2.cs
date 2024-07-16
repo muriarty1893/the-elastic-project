@@ -19,7 +19,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("pro");
+            .DefaultIndex("wee");
         return new ElasticClient(settings);
     }
 
