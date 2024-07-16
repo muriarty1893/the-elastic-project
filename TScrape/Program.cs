@@ -22,7 +22,7 @@ public class Program
     {
         // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("cumbakuruyemiss");
+            .DefaultIndex("cumbakuruyemissss");
         return new ElasticClient(settings);
     }
 
@@ -30,49 +30,61 @@ public class Program
     {
         var url = "https://cumbakuruyemis.com/Kategori";
         var httpClient = new HttpClient();
-        var html = await httpClient.GetStringAsync(url);
-
-        var htmlDocument = new HtmlDocument();
-        htmlDocument.LoadHtml(html);
-
-        var productNodes = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class, 'col-xl-4 col-lg-6 col-md-6 mt-4')]");
         var products = new List<Product>();
 
-        if (productNodes != null)
+        try
         {
-            foreach (var node in productNodes)
+            var html = await httpClient.GetStringAsync(url);
+
+            var htmlDocument = new HtmlDocument();
+            htmlDocument.LoadHtml(html);
+
+            var productNodes = htmlDocument.DocumentNode.SelectNodes("//div[contains(@class, 'col-xl-4 col-lg-6 col-md-6 mt-4')]");
+
+            if (productNodes != null)
             {
-                var productNameNode = node.SelectSingleNode(".//a[@class='text-decoration-none textBlack']");
-                var priceNodes = node.SelectNodes(".//div[contains(@class, 'newPrice')]");
-                var quantityNodes = node.SelectNodes(".//span[contains(@class, 'productQuantityText')]");
-
-                var prices = new List<string>();
-                if (priceNodes != null)
+                foreach (var node in productNodes)
                 {
-                    foreach (var priceNode in priceNodes)
+                    var productNameNode = node.SelectSingleNode(".//a[@class='text-decoration-none textBlack']");
+                    var priceNodes = node.SelectNodes(".//div[contains(@class, 'newPrice')]");
+                    var quantityNodes = node.SelectNodes(".//span[contains(@class, 'productQuantityText')]");
+
+                    var prices = new List<string>();
+                    if (priceNodes != null)
                     {
-                        prices.Add(priceNode.InnerText.Trim());
+                        foreach (var priceNode in priceNodes)
+                        {
+                            prices.Add(priceNode.InnerText.Trim());
+                        }
                     }
-                }
 
-                var quantities = new List<string>();
-                if (quantityNodes != null)
-                {
-                    foreach (var quantityNode in quantityNodes)
+                    var quantities = new List<string>();
+                    if (quantityNodes != null)
                     {
-                        quantities.Add(quantityNode.InnerText.Trim());
+                        foreach (var quantityNode in quantityNodes)
+                        {
+                            quantities.Add(quantityNode.InnerText.Trim());
+                        }
                     }
+
+                    var product = new Product
+                    {
+                        ProductName = productNameNode?.InnerText.Trim(),
+                        Prices = prices,
+                        Quantities = quantities
+                    };
+
+                    products.Add(product);
                 }
-
-                var product = new Product
-                {
-                    ProductName = productNameNode?.InnerText.Trim(),
-                    Prices = prices,
-                    Quantities = quantities
-                };
-
-                products.Add(product);
             }
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"Request error: {e.Message}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"An error occurred: {e.Message}");
         }
 
         return products;
@@ -90,10 +102,10 @@ public class Program
     private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
     {
         // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
-        var indexExistsResponse = client.Indices.Exists("cumbakuruyemiss");
+        var indexExistsResponse = client.Indices.Exists("cumbakuruyemissss");
         if (!indexExistsResponse.Exists)
         {
-            var createIndexResponse = client.Indices.Create("cumbakuruyemiss", c => c
+            var createIndexResponse = client.Indices.Create("cumbakuruyemissss", c => c
                 .Map<Product>(m => m.AutoMap())
             );
 
@@ -173,7 +185,7 @@ public class Program
 
         var products = await ScrapeWebAsync(); // Web sitesinden ürünleri çeker
         
-        const string flagFilePath = "flags/indexing_done_18.flag"; // Dosya oluşturmak için
+        const string flagFilePath = "flags/indexing_done_20.flag"; // Dosya oluşturmak için
         
         if (!File.Exists(flagFilePath)) // Dosyanın oluşturulup oluşturulmadığını kontrol eder
         {   
