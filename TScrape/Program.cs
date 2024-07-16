@@ -177,8 +177,9 @@ public class Program
         });
         var logger = loggerFactory.CreateLogger<Program>();
 
-        Stopwatch stopwatch = new Stopwatch(); // Zamanlayıcı oluşturur
-
+        Stopwatch stopwatch1 = new Stopwatch(); // Zamanlayıcı oluşturur
+        Stopwatch stopwatch2 = new Stopwatch(); 
+        stopwatch2.Start();
         var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
 
         CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
@@ -192,11 +193,15 @@ public class Program
             IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
             File.Create(flagFilePath).Dispose(); // Dosya oluşturularak indekslemenin yapıldığını işaretler
         } 
-        var item = "badem" ; // user input ----------------------------------------------------------------
-        stopwatch.Start();
-        SearchProducts(client, item, logger); // Elasticsearch'te girilen kelimeyi arar
-        stopwatch.Stop();
 
-        Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
+        var item = "badem" ; // user input ----------------------------------------------------------------
+        
+        stopwatch1.Start();
+        SearchProducts(client, item, logger); // Elasticsearch'te girilen kelimeyi arar
+        stopwatch1.Stop();
+        stopwatch2.Stop();
+
+        Console.WriteLine($"Search completed in {stopwatch1.ElapsedMilliseconds} ms.");
+        Console.WriteLine($"All completed in {stopwatch2.ElapsedMilliseconds} ms.");
     }
 }
