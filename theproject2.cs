@@ -1,72 +1,150 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Nest;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Logging.Debug;
 
-// Bu sınıf ürün bilgilerini tutmak için kullanılır
 public class Product
 {
-    public string Title { get; set; }
-    public string Description { get; set; }
+    public string ProductName { get; set; }
 }
 
 public class Program
 {
-    static async System.Threading.Tasks.Task Main(string[] args)
+    private static ElasticClient CreateElasticClient()
     {
-        // Elasticsearch bağlantısı için gerekli ayarlar
+        // Elasticsearch bağlantı ayarlarını yapılandırır ve bir ElasticClient döndürür.
         var settings = new ConnectionSettings(new Uri("http://localhost:9200"))
-            .DefaultIndex("trendyol1"); // Varsayılan indeks ismi 'products' olarak ayarlandı
+            .DefaultIndex("pro");
+        return new ElasticClient(settings);
+    }
 
-        var client = new ElasticClient(settings);
-
-        // Web scraping için kullanacağımız URL
-        var url = "https://www.trendyol.com/hc-care/complex-bitkisel-sac-bakim-kompleksi-100-ml-p-7103578?boutiqueId=61&merchantId=110268&sav=true"; // Örnek olarak Trendyol ana sayfası
-
+    private static async Task<List<Product>> ScrapeTrendyolAsync()
+    {
+        var url = "https://www.trendyol.com/gezer/erkek-siyah-beyaz-rahat-taban-lux-banyo-havuz-plaj-terlik-p-99258600?boutiqueId=61&merchantId=141253&sav=true";
         var httpClient = new HttpClient();
         var html = await httpClient.GetStringAsync(url);
 
-        // HtmlAgilityPack kullanarak HTML belgesini yükle
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(html);
 
-        // HTML belgesinde istediğimiz verileri seçmek için XPath veya CSS seçicilerini kullanın
-        // Bu örnekte, ürün başlıklarını ve açıklamalarını çekiyoruz
         var productNodes = htmlDocument.DocumentNode.SelectNodes("//h1[@class='pr-new-br']");
-
         var products = new List<Product>();
 
-        foreach (var node in productNodes)
+        if (productNodes != null)
         {
-            var titleNode = node.SelectSingleNode(".//a[@class='product-brand-name-with-link']");
-            var titleSpan = node.SelectSingleNode(".//span");
-
-            if (titleNode != null && titleSpan != null)
+            foreach (var node in productNodes)
             {
-                // Ürün açıklamalarını bulmak için ilgili bölümdeki XPath ifadesi
-                var descriptionNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@id='marketing-product-detail-seo-content']//div[@class='product-detail-seo-content']//div[@class='seo-content-wrapper']//div[@class='seo-content']//section//div//div//p");
+                var titleNode = node.SelectSingleNode(".//a[@class='product-brand-name-with-link']");
+                var titleSpan = node.SelectSingleNode(".//span");
 
-                var product = new Product
+                if (titleNode != null && titleSpan != null)
                 {
-                    Title = $"{titleNode.InnerText.Trim()} {titleSpan.InnerText.Trim()}",
-                    Description = descriptionNode?.InnerText.Trim()
-                };
-
-                products.Add(product);
+                    var product = new Product
+                    {
+                        ProductName = $"{titleNode.InnerText.Trim()} {titleSpan.InnerText.Trim()}"
+                    };
+                    products.Add(product);
+                }
             }
         }
 
-        // Çekilen verileri Elasticsearch'e indekslemek için
-        var indexResponse = client.IndexMany(products);
+        return products;
+    }
 
-        if (indexResponse.Errors)
+    private static void IndexProducts(ElasticClient client, List<Product> products, ILogger logger)
+    {
+        // Elasticsearch'e ürünleri indeksler.
+        foreach (var product in products)
         {
-            Console.WriteLine("Bazı veriler indekslenirken hata oluştu.");
+            var response = client.IndexDocument(product);
+            if (!response.IsValid)
+            {
+                logger.LogError($"Error indexing product: {product.ProductName}, Reason: {response.ServerError}");
+            }
         }
-        else
+    }
+
+    private static void CreateIndexIfNotExists(ElasticClient client, ILogger logger)
+    {
+        // Elasticsearch'te indexin var olup olmadığını kontrol eder, yoksa oluşturur.
+        var indexExistsResponse = client.Indices.Exists("products");
+        if (!indexExistsResponse.Exists)
         {
-            Console.WriteLine("Veriler başarıyla indekslendi.");
+            var createIndexResponse = client.Indices.Create("products", c => c
+                .Map<Product>(m => m.AutoMap())
+            );
+
+            if (!createIndexResponse.IsValid)
+            {
+                logger.LogError("Error creating index: {Reason}", createIndexResponse.ServerError);
+            }
         }
+    }
+
+    private static void SearchProducts(ElasticClient client, string searchText, ILogger logger)
+    {
+        // Verilen metinle eşleşen ürünleri Elasticsearch'te arar.
+        var searchResponse = client.Search<Product>(s => s
+            .Query(q => q
+                .MultiMatch(mm => mm
+                    .Query(searchText)
+                    .Fields(f => f
+                        .Field(p => p.ProductName, 3.0) // Ürün adına ağırlık verir.
+                    )
+                    .Fuzziness(Fuzziness.Auto) // Otomatik bulanıklık ayarı.
+                )
+            )
+            .Sort(srt => srt
+                .Descending(SortSpecialField.Score) // Sonuçları puan sırasına göre sıralar.
+            )
+        );
+
+        if (!searchResponse.IsValid)
+        {
+            logger.LogError("Error searching products: {Reason}", searchResponse.ServerError);
+            return;
+        }
+
+        Console.WriteLine("Results:\n--------------------------------------------");
+        int counter = 0; // 
+        int x = 5; // çıktıda gösterilecek sonuç sayısı
+        foreach (var product in searchResponse.Documents)
+        {
+            if (counter >= x) { break; } // En fazla x ürünü yazdırması için.
+            Console.WriteLine($"Product: {product.ProductName}\n--------------------------------------------");
+            counter++;
+        }
+        Console.WriteLine(searchResponse.Documents.Count + " matchup");
+    }
+
+    public static async Task Main(string[] args)
+    {
+        // Logger kurulumu
+        using var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+            builder.AddDebug();
+        });
+        var logger = loggerFactory.CreateLogger<Program>();
+
+        Stopwatch stopwatch = new Stopwatch(); // Zamanlayıcı oluşturur
+
+        var client = CreateElasticClient(); // Elasticsearch istemcisini oluşturur
+
+        CreateIndexIfNotExists(client, logger); // Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
+
+        var products = await ScrapeTrendyolAsync(); // Trendyol web sitesinden ürünleri çeker
+        IndexProducts(client, products, logger); // Çekilen ürünleri Elasticsearch'e indeksler
+
+        stopwatch.Start();
+        SearchProducts(client, "icecek", logger); // Elasticsearch'te girilen kelimeyi arar
+        stopwatch.Stop();
+
+        Console.WriteLine($"Search completed in {stopwatch.ElapsedMilliseconds} ms.");
     }
 }
