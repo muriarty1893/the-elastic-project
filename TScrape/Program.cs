@@ -141,6 +141,13 @@ public class Program
                     Console.WriteLine($"Price: {price}");
                 }
             }
+            if (product.Quantities != null)
+            {
+                foreach (var quantity in product.Quantities)
+                {
+                    Console.WriteLine($"Quantity: {quantity}");
+                }
+            }
             Console.WriteLine("--------------------------------------------");
             counter++;
         }
