@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TScrape")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80962fa4e92aaa18cedaba1714076c2ae3296514")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3085f17e4c4de0076154cc4a0dfbd4d528bd2853")]
 [assembly: System.Reflection.AssemblyProductAttribute("TScrape")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TScrape")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
