@@ -117,6 +117,7 @@ def search_products(client, search_text, logger):
 
 # Ana fonksiyon
 def main():
+    start_time1 = time.time()
     # Logger kurulumu
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("ProductScraper")
@@ -143,16 +144,16 @@ def main():
 
     item = "steelseriec"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
     if os.path.exists(flag_file_path):
-        start_time = time.time()
+        start_time2 = time.time()
         search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
-        search_duration = time.time() - start_time
+        search_duration = time.time() - start_time2
         
         # Sıralama seçeneğini yazdırır
         print("Sorting Option:\n--------------------------------------------")
         sorting_option = soup.select_one('div.selected-order')
         if sorting_option:
             print(f"Sorting Option: {sorting_option.get_text().strip()}")
-        total_duration = time.time() - start_time
+        total_duration = time.time() - start_time1
         print(f"Search completed in {search_duration * 1000:.2f} ms.")
         print(f"All completed in {total_duration * 1000:.2f} ms.")
 
