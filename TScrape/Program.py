@@ -58,7 +58,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "gaming-mo",
+            "_index": "gaming-mous",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -72,8 +72,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="gaming-mo"):
-        client.indices.create(index="gaming-mo", body={
+    if not client.indices.exists(index="gaming-mous"):
+        client.indices.create(index="gaming-mous", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -86,12 +86,14 @@ def create_index_if_not_exists(client, logger):
 # Elasticsearch'te verilen metinle eşleşen ürünleri arar
 def search_products(client, search_text, logger):
     search_response = client.search(
-        index="gaming-mo",
+        index="gaming-mous",
         body={
             "query": {
-                "multi_match": {
-                    "query": search_text,
-                    "fields": ["product_name^3"]
+                "fuzzy": {
+                    "product_name": {
+                        "value": search_text,
+                        "fuzziness": "AUTO"
+                    }
                 }
             },
             "sort": {
@@ -137,7 +139,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "havit"  # Kullanıcı girdisi
+    item = "SteelSeries"  # Kullanıcı girdisi
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
