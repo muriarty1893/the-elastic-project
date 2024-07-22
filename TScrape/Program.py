@@ -56,7 +56,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "cumbakuruyemish",
+            "_index": "gaming-mouse",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -70,8 +70,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="cumbakuruyemish"):
-        client.indices.create(index="cumbakuruyemish", body={
+    if not client.indices.exists(index="gaming-mouse"):
+        client.indices.create(index="gaming-mouse", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -84,7 +84,7 @@ def create_index_if_not_exists(client, logger):
 # Elasticsearch'te verilen metinle eşleşen ürünleri arar
 def search_products(client, search_text, logger):
     search_response = client.search(
-        index="cumbakuruyemish",
+        index="gaming-mouse",
         body={
             "query": {
                 "multi_match": {
@@ -114,7 +114,7 @@ def main():
     # Logger kurulumu
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("ProductScraper")
-
+    
     # Elasticsearch istemcisini oluşturur
     client = create_elastic_client()
 
@@ -124,7 +124,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products = scrape_web()
 
-    flag_file_path = "flags/indexing_done_26.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_27.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
@@ -135,7 +135,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "badem"  # Kullanıcı girdisi
+    item = "Gamepower"  # Kullanıcı girdisi
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
