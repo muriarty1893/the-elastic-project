@@ -86,7 +86,7 @@ def create_index_if_not_exists(client, logger):
 # Elasticsearch'te verilen metinle eşleşen ürünleri arar
 def search_products(client, search_text, logger):
     search_response = client.search(
-        index="gaming-m",
+        index="gaming-mo",
         body={
             "query": {
                 "multi_match": {
@@ -137,7 +137,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "Gamepower"  # Kullanıcı girdisi
+    item = "havit"  # Kullanıcı girdisi
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
