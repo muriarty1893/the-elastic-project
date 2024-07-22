@@ -97,3 +97,12 @@ C:\Users\Murat Eker\Desktop\4.hafta\QOL\the-project\TScrape\obj\Debug\net8.0\ref
 C:\Users\Murat Eker\Desktop\4.hafta\QOL\the-project\TScrape\obj\Debug\net8.0\TScrape.pdb
 C:\Users\Murat Eker\Desktop\4.hafta\QOL\the-project\TScrape\obj\Debug\net8.0\TScrape.genruntimeconfig.cache
 C:\Users\Murat Eker\Desktop\4.hafta\QOL\the-project\TScrape\obj\Debug\net8.0\ref\TScrape.dll
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.csproj.AssemblyReference.cache
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.AssemblyInfoInputs.cache
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.AssemblyInfo.cs
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.csproj.CoreCompileInputs.cache
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.sourcelink.json
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.dll
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\refint\TScrape.dll
+C:\Users\Murat Eker\Desktop\4.hafta\elastic\the-project\TScrape\obj\Debug\net8.0\TScrape.pdb
