@@ -104,6 +104,8 @@ def search_products(client, search_text, logger):
 
     results = search_response['hits']['hits']
     print("Results:\n--------------------------------------------")
+    print(f"{len(results)} match(es):")
+    print("--------------------------------------------")
     for i, result in enumerate(results[:10]):
         product = result["_source"]
         print(f"Product: {product['product_name']}")
@@ -111,7 +113,6 @@ def search_products(client, search_text, logger):
             print(f"Price: {price}")
         print(f"Rating Count: {product.get('rating_count', 'N/A')}")
         print("--------------------------------------------")
-    print(f"{len(results)} match(es).")
 
 # Ana fonksiyon
 def main():
@@ -139,7 +140,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "SteelSerie"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
+    item = "steelserie"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
