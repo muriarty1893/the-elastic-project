@@ -92,7 +92,7 @@ def search_products(client, search_text, logger):
                 "fuzzy": {
                     "product_name": {
                         "value": search_text,
-                        "fuzziness": "AUTO"
+                        "fuzziness": 2
                     }
                 }
             },
