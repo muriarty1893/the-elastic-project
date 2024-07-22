@@ -58,7 +58,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "tms",
+            "_index": "trendyolaaaaaa",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -72,8 +72,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="tms"):
-        client.indices.create(index="tms", body={
+    if not client.indices.exists(index="trendyolaaaaaa"):
+        client.indices.create(index="trendyolaaaaaa", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -87,7 +87,7 @@ def create_index_if_not_exists(client, logger):
 def search_products(client, search_text, logger):
     # Fuzzy search yerine daha geniş bir eşleme için multi_match query kullanıyoruz
     search_response = client.search(
-        index="tms",
+        index="trendyolaaaaaa",
         body={
             "query": {
                 "multi_match": {
@@ -130,7 +130,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_38.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_39.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
