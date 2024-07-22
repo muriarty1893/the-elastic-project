@@ -18,7 +18,7 @@ def create_elastic_client():
 
 # Web'den veri çekme işlemi
 def scrape_web():
-    url = "https://www.trendyol.com/sr/oyuncu-mouselari-x-c106088?sst=BEST_SELLER"  # Veri çekilecek web sitesi
+    url = "https://www.trendyol.com/sr/oyuncu-mouselari-x-c106088?sst=BEST_SELLER&pi=20"  # Veri çekilecek web sitesi
     #  https://www.trendyol.com/oyuncu-mouselari-x-c106088?sst=SCORE
     response = requests.get(url)
     products = []
@@ -59,7 +59,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "bestsel",
+            "_index": "bestsell",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -73,8 +73,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="bestsel"):
-        client.indices.create(index="bestsel", body={
+    if not client.indices.exists(index="bestsell"):
+        client.indices.create(index="bestsell", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -88,7 +88,7 @@ def create_index_if_not_exists(client, logger):
 def search_products(client, search_text, logger):
     # Fuzzy search yerine daha geniş bir eşleme için multi_match query kullanıyoruz
     search_response = client.search(
-        index="bestsel",
+        index="bestsell",
         body={
             "query": {
                 "multi_match": {
@@ -130,7 +130,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_35.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_36.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
