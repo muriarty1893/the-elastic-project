@@ -18,8 +18,8 @@ def create_elastic_client():
 
 # Web'den veri çekme işlemi
 def scrape_web():
-    url = "https://www.trendyol.com/oyuncu-mouselari-x-c106088?sst=SCORE"  # Veri çekilecek web sitesi 
-    # https://www.trendyol.com/sr/oyuncu-mouselari-x-c106088?sst=
+    url = "https://www.trendyol.com/sr/oyuncu-mouselari-x-c106088?sst=BEST_SELLER"  # Veri çekilecek web sitesi
+    #  https://www.trendyol.com/oyuncu-mouselari-x-c106088?sst=SCORE
     response = requests.get(url)
     products = []
 
@@ -35,9 +35,9 @@ def scrape_web():
 
             product_name = (
                 " ".join([
-                    product_name_node.select_one("span.prdct-desc-cntnr-ttl").get_text().strip(),
-                    product_name_node.select_one("span.prdct-desc-cntnr-name").get_text().strip(),
-                    product_name_node.select_one("div.product-desc-sub-text").get_text().strip()
+                    product_name_node.select_one("span.prdct-desc-cntnr-ttl").get_text().strip() if product_name_node.select_one("span.prdct-desc-cntnr-ttl") else "",
+                    product_name_node.select_one("span.prdct-desc-cntnr-name").get_text().strip() if product_name_node.select_one("span.prdct-desc-cntnr-name") else "",
+                    product_name_node.select_one("div.product-desc-sub-text").get_text().strip() if product_name_node.select_one("div.product-desc-sub-text") else ""
                 ])
                 if product_name_node else None
             )
@@ -59,7 +59,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "bests",
+            "_index": "bestsel",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -73,8 +73,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="bests"):
-        client.indices.create(index="bests", body={
+    if not client.indices.exists(index="bestsel"):
+        client.indices.create(index="bestsel", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -88,7 +88,7 @@ def create_index_if_not_exists(client, logger):
 def search_products(client, search_text, logger):
     # Fuzzy search yerine daha geniş bir eşleme için multi_match query kullanıyoruz
     search_response = client.search(
-        index="bests",
+        index="bestsel",
         body={
             "query": {
                 "multi_match": {
@@ -130,7 +130,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_34.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_35.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
@@ -141,7 +141,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "steelserie"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
+    item = "steelseriec"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
