@@ -14,7 +14,7 @@ class Product:
 
 # Elasticsearch istemcisini oluşturur
 def create_elastic_client():
-    return Elasticsearch([{'host': 'localhost', 'port': 9200}])
+    return Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
 
 # Web'den veri çekme işlemi
 def scrape_web():
@@ -49,14 +49,16 @@ def scrape_web():
                 rating_count=rating_count
             )
             products.append(product)
+        
+        return products, soup  # soup değişkenini de döndürüyoruz
 
-    return products
+    return products, None
 
 # Elasticsearch'e ürünleri indeksler
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "gaming-fare",
+            "_index": "gaming-m",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -70,8 +72,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="gaming-fare"):
-        client.indices.create(index="gaming-fare", body={
+    if not client.indices.exists(index="gaming-m"):
+        client.indices.create(index="gaming-m", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -84,7 +86,7 @@ def create_index_if_not_exists(client, logger):
 # Elasticsearch'te verilen metinle eşleşen ürünleri arar
 def search_products(client, search_text, logger):
     search_response = client.search(
-        index="gaming-fare",
+        index="gaming-m",
         body={
             "query": {
                 "multi_match": {
@@ -122,9 +124,9 @@ def main():
     create_index_if_not_exists(client, logger)
 
     # Web sitesinden ürünleri çeker
-    products = scrape_web()
+    products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_28.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_29.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
@@ -135,7 +137,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "Gamepower"  # Kullanıcı girdisi adsfsd
+    item = "Gamepower"  # Kullanıcı girdisi
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
