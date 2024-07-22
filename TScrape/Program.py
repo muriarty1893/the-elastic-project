@@ -18,7 +18,8 @@ def create_elastic_client():
 
 # Web'den veri çekme işlemi
 def scrape_web():
-    url = "https://www.trendyol.com/oyuncu-mouselari-x-c106088?sst=SCORE"  # Veri çekilecek web sitesi
+    url = "https://www.trendyol.com/oyuncu-mouselari-x-c106088?sst=SCORE"  # Veri çekilecek web sitesi 
+    # https://www.trendyol.com/sr/oyuncu-mouselari-x-c106088?sst=
     response = requests.get(url)
     products = []
 
