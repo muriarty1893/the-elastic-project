@@ -139,7 +139,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "SteelSeriec"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
+    item = "SteelSerie"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
