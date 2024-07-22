@@ -146,7 +146,6 @@ def main():
         start_time2 = time.time()
         search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
         search_duration = time.time() - start_time2
-        
         # Sıralama seçeneğini yazdırır
         print("Sorting Option:\n--------------------------------------------")
         sorting_option = soup.select_one('div.selected-order')
