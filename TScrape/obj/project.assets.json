@@ -1194,11 +1194,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Murat Eker\\Desktop\\theproject3\\the-project\\TScrape\\TScrape.csproj",
+      "projectUniqueName": "C:\\Users\\Murat Eker\\Desktop\\4.hafta\\QOL\\the-project\\TScrape\\TScrape.csproj",
       "projectName": "TScrape",
-      "projectPath": "C:\\Users\\Murat Eker\\Desktop\\theproject3\\the-project\\TScrape\\TScrape.csproj",
+      "projectPath": "C:\\Users\\Murat Eker\\Desktop\\4.hafta\\QOL\\the-project\\TScrape\\TScrape.csproj",
       "packagesPath": "C:\\Users\\Murat Eker\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Murat Eker\\Desktop\\theproject3\\the-project\\TScrape\\obj\\",
+      "outputPath": "C:\\Users\\Murat Eker\\Desktop\\4.hafta\\QOL\\the-project\\TScrape\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Murat Eker\\AppData\\Roaming\\NuGet\\NuGet.Config",

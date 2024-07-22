@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3evxXTUX2Jk=",
+  "dgSpecHash": "oJ7SImbl7gY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Murat Eker\\Desktop\\theproject3\\the-project\\TScrape\\TScrape.csproj",
+  "projectFilePath": "C:\\Users\\Murat Eker\\Desktop\\4.hafta\\QOL\\the-project\\TScrape\\TScrape.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Murat Eker\\.nuget\\packages\\elasticsearch.net\\7.17.5\\elasticsearch.net.7.17.5.nupkg.sha512",
     "C:\\Users\\Murat Eker\\.nuget\\packages\\htmlagilitypack\\1.11.61\\htmlagilitypack.1.11.61.nupkg.sha512",
