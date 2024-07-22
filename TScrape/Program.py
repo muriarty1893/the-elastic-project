@@ -135,7 +135,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "Gamepower"  # Kullanıcı girdisi
+    item = "Gamepower"  # Kullanıcı girdisi adsfsd
 
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
