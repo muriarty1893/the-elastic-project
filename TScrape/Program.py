@@ -74,7 +74,7 @@ def index_products(client, products, logger):
 def create_index_if_not_exists(client, logger):
     if not client.indices.exists(index="gaming-mous"):
         client.indices.create(index="gaming-mous", body={
-            "mappings": {
+            "mappings": { # pointer
                 "properties": {
                     "product_name": {"type": "text"},
                     "prices": {"type": "keyword"},
