@@ -110,9 +110,14 @@ def search_products(client, search_text, logger):
         product = result["_source"]
         print(f"Product: {product['product_name']}")
         for price in product.get('prices', []):
-            print(f"Price: {price}")
-        print(f"Rating Count: {product.get('rating_count', 'N/A')}")
-        print("--------------------------------------------")
+            print(f"Price: {price}") 
+            carry = product.get('rating_count', 'N/A').replace("(","").replace(")","")
+        if(int(carry) < 100):
+            print(f"Rating Count: {product.get('rating_count', 'N/A')} warning! number of rate is below 100")
+            print("--------------------------------------------")
+        else:
+            print(f"Rating Count: {product.get('rating_count', 'N/A')}")
+            print("--------------------------------------------")
 
 # Ana fonksiyon
 def main():
@@ -141,7 +146,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "steelseriec"  # Kullanıcı girdisi ------------------------------------------------------------------------------------- (ヘ･_･)ヘ
+    item = "rampage"  # Kullanıcı girdisi ------------------------------------------------------------------------------------- (ヘ･_･)ヘ
     if os.path.exists(flag_file_path):
         start_time2 = time.time()
         search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
