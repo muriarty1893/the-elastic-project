@@ -141,7 +141,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "steelseriec"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
+    item = "steelseriec"  # Kullanıcı girdisi ------------------------------------------------------------------------------------- (ヘ･_･)ヘ
     if os.path.exists(flag_file_path):
         start_time2 = time.time()
         search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
