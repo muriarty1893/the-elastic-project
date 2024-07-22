@@ -58,7 +58,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "gaming-m",
+            "_index": "gaming-mo",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -72,8 +72,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="gaming-m"):
-        client.indices.create(index="gaming-m", body={
+    if not client.indices.exists(index="gaming-mo"):
+        client.indices.create(index="gaming-mo", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -126,7 +126,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_29.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_30.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
@@ -142,16 +142,15 @@ def main():
     start_time = time.time()
     search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
     search_duration = time.time() - start_time
-    total_duration = time.time() - start_time
-
-    print(f"Search completed in {search_duration * 1000:.2f} ms.")
-    print(f"All completed in {total_duration * 1000:.2f} ms.")
-
+    
     # Sıralama seçeneğini yazdırır
     print("Sorting Option:\n--------------------------------------------")
     sorting_option = soup.select_one('div.selected-order')
     if sorting_option:
         print(f"Sorting Option: {sorting_option.get_text().strip()}")
+    total_duration = time.time() - start_time
+    print(f"Search completed in {search_duration * 1000:.2f} ms.")
+    print(f"All completed in {total_duration * 1000:.2f} ms.")
 
 if __name__ == "__main__":
     main()
