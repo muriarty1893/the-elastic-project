@@ -128,7 +128,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_30.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_31.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
