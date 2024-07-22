@@ -60,10 +60,15 @@ pip install -r requirements.txt
 
 ### :file_folder: File Structure
 .
+
 ├── flags
+
 │ └── indexing_done_37.flag # Flag file to check if indexing is done
+
 ├── trendyol_scraper.py # Main Python script
+
 ├── requirements.txt # Python dependencies
+
 └── README.md # This file
 
 | No | File Name | Details |
