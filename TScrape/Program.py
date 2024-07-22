@@ -142,19 +142,19 @@ def main():
             flag_file.write('')
 
     item = "steelseriec"  # Kullanıcı girdisi -------------------------------------------------------------------------------------
-
-    start_time = time.time()
-    search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
-    search_duration = time.time() - start_time
-    
-    # Sıralama seçeneğini yazdırır
-    print("Sorting Option:\n--------------------------------------------")
-    sorting_option = soup.select_one('div.selected-order')
-    if sorting_option:
-        print(f"Sorting Option: {sorting_option.get_text().strip()}")
-    total_duration = time.time() - start_time
-    print(f"Search completed in {search_duration * 1000:.2f} ms.")
-    print(f"All completed in {total_duration * 1000:.2f} ms.")
+    if os.path.exists(flag_file_path):
+        start_time = time.time()
+        search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
+        search_duration = time.time() - start_time
+        
+        # Sıralama seçeneğini yazdırır
+        print("Sorting Option:\n--------------------------------------------")
+        sorting_option = soup.select_one('div.selected-order')
+        if sorting_option:
+            print(f"Sorting Option: {sorting_option.get_text().strip()}")
+        total_duration = time.time() - start_time
+        print(f"Search completed in {search_duration * 1000:.2f} ms.")
+        print(f"All completed in {total_duration * 1000:.2f} ms.")
 
 if __name__ == "__main__":
     main()
