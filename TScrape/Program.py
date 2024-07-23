@@ -60,7 +60,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "olderindex",
+            "_index": "olderone",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -74,8 +74,8 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="olderindex"):
-        client.indices.create(index="olderindex", body={
+    if not client.indices.exists(index="olderone"):
+        client.indices.create(index="olderone", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -89,13 +89,26 @@ def create_index_if_not_exists(client, logger):
 # Elasticsearch'te verilen metinle eşleşen ürünleri arar
 def search_products(client, search_text, logger):
     search_response = client.search(
-        index="olderindex",
+        index="olderone",
         body={
             "query": {
-                "multi_match": {
-                    "query": search_text,
-                    "fields": ["product_name^3", "prices", "rating_count"],
-                    "fuzziness": "AUTO"
+                "bool": {
+                    "must": [
+                        {
+                            "multi_match": {
+                                "query": search_text,
+                                "fields": ["product_name^3", "rating_count"],
+                                "fuzziness": "AUTO"
+                            }
+                        },
+                        {
+                            "range": {
+                                "prices": {
+                                    "gte": 0
+                                }
+                            }
+                        }
+                    ]
                 }
             },
             "aggs": {
@@ -104,8 +117,10 @@ def search_products(client, search_text, logger):
                         "field": "prices",
                         "ranges": [
                             {"to": 50},
-                            {"from": 50, "to": 100},
-                            {"from": 100}
+                            {"from": 50, "to": 200},
+                            {"from": 200, "to": 600},
+                            {"from": 600, "to": 1000},
+                            {"from": 1000}
                         ]
                     }
                 }
@@ -121,7 +136,7 @@ def search_products(client, search_text, logger):
         product = result["_source"]
         print(f"Product: {product['product_name']}")
         for price in product.get('prices', []):
-            print(f"Price: {price}") 
+            print(f"Price: {price}")
             carry = product.get('rating_count', 'N/A').replace("(","").replace(")","")
         if(int(carry) < 100):
             print(f"Rating Count: {product.get('rating_count', 'N/A')} warning! number of rate is below 100")
@@ -150,7 +165,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_44.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_45.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
@@ -161,7 +176,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "steelser"  # Kullanıcı girdisi
+    item = "steelseries"  # Kullanıcı girdisi
     if os.path.exists(flag_file_path):
         start_time2 = time.time()
         search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
