@@ -87,7 +87,7 @@ def create_index_if_not_exists(client, logger):
 
 
 # Elasticsearch'te verilen metinle eşleşen ürünleri arar
-def search_products(client, search_text, logger):
+def search_products(client, search_text, logger): # 
     search_response = client.search(
         index="olderone",
         body={
@@ -193,3 +193,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+# le 
+#   toucan  
+#         has
+#           arrived
