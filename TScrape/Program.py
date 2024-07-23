@@ -41,11 +41,13 @@ def scrape_web():
                 if product_name_node else None
             )
             price = price_node.get_text().strip() if price_node else None
+            if price:
+                price = float(price.replace("TL", "").replace(",", "").replace(".", ""))
             rating_count = rating_count_node.get_text().strip() if rating_count_node else None
 
             product = Product(
                 product_name=product_name,
-                prices=[price],
+                prices=[price] if price else [],
                 rating_count=rating_count
             )
             products.append(product)
@@ -58,7 +60,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "oldindex",
+            "_index": "olderindex",
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -72,21 +74,22 @@ def index_products(client, products, logger):
 
 # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="oldindex"):
-        client.indices.create(index="oldindex", body={
+    if not client.indices.exists(index="olderindex"):
+        client.indices.create(index="olderindex", body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
-                    "prices": {"type": "keyword"},
+                    "prices": {"type": "float"},
                     "rating_count": {"type": "keyword"}
                 }
             }
         })
 
+
 # Elasticsearch'te verilen metinle eşleşen ürünleri arar
 def search_products(client, search_text, logger):
     search_response = client.search(
-        index="oldindex",
+        index="olderindex",
         body={
             "query": {
                 "multi_match": {
@@ -147,7 +150,7 @@ def main():
     # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_43.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_44.flag"  # Dosya oluşturmak için
 
     # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
@@ -158,7 +161,7 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "steelser"  # Kullanıcı girdisi ------------------------------------------------------------------------------------- (ヘ･_･)ヘ
+    item = "steelser"  # Kullanıcı girdisi
     if os.path.exists(flag_file_path):
         start_time2 = time.time()
         search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
