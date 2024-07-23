@@ -1,4 +1,4 @@
-/TScrape/bin
-/TScrape/obj
+TScrape/bin
+TScrape/obj
 TScrape.csproj
 docker-compose.yml
