@@ -43,7 +43,10 @@ namespace ProductScraper
                 await File.WriteAllTextAsync(FlagName, "");
             }
 
-            string item = "steelseries";
+
+            string item = "steelseries"; // ------------------------------------------------------------------- user input ------------------------------------------
+            
+            
             if (File.Exists(FlagName))
             {
                 await SearchProducts(client, item);
