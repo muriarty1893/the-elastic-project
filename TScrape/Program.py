@@ -10,8 +10,8 @@ from sklearn.linear_model import LinearRegression
 
 
 
-indexname = "indext6"
-flagname = "flags/indexing_done_58.flag"
+indexname = "indext7"
+flagname = "flags/indexing_done_59.flag"
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, attributes=None):
