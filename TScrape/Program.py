@@ -150,9 +150,8 @@ def search_products(client, search_text, logger):
     )
 
     results = search_response['hits']['hits']
+    print(f"\n\n{len(results)} match(es):")
     print("Results:\n--------------------------------------------")
-    print(f"{len(results)} match(es):")
-    print("--------------------------------------------")
     for i, result in enumerate(results[:10]):
         product = result["_source"]
         print(f"Product: {product['product_name']}")
