@@ -5,14 +5,14 @@ import logging
 import os
 import time
 
-indexname = "indext3"
+indexname = "indext1" 
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, attributes=None):
         self.product_name = product_name
         self.prices = prices or []
         self.rating_count = rating_count or []
-        self.attributes = attributes or {}
+        self.attributes = attributes or {}  # Attributes field added to store additional details
 
 def create_elastic_client():
     return Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
@@ -30,7 +30,7 @@ def scrape_web():
             product_name_node = node.select_one("h3.prdct-desc-cntnr-ttl-w")
             price_node = node.select_one("div.prc-box-dscntd")
             rating_count_node = node.select_one("span.ratingCount")
-            product_link_node = node.select_one("a")
+            product_link_node = node.select_one("a")  # Selector for the product link
 
             product_name = (
                 " ".join([
@@ -44,15 +44,15 @@ def scrape_web():
             if price:
                 price = float(price.replace("TL", "").replace(",", "").replace(".", ""))
             rating_count = rating_count_node.get_text().strip() if rating_count_node else None
-            product_link = f"https://www.trendyol.com{product_link_node['href']}" if product_link_node else None
+            product_link = f"https://www.trendyol.com{product_link_node['href']}" if product_link_node else None  # Construct full URL
 
-            attributes = scrape_product_details(product_link) if product_link else {}
+            attributes = scrape_product_details(product_link) if product_link else {}  # Scrape product details if link is present
 
             product = Product(
                 product_name=product_name,
                 prices=[price] if price else [],
                 rating_count=rating_count,
-                attributes=attributes
+                attributes=attributes  # Add attributes to the product
             )
             products.append(product)
         
@@ -74,6 +74,7 @@ def scrape_product_details(url):
             'Buton Sayısı': 'button_count'
         }
 
+        # Loop through each attribute mapping and extract the text value
         for attr_name, key in attribute_mappings.items():
             attr_node = soup.select_one(f'span[title="{attr_name}"] + span.attribute-value > div.attr-name.attr-name-w')
             attributes[key] = attr_node.get_text().strip() if attr_node else None
@@ -88,7 +89,7 @@ def index_products(client, products, logger):
                 "product_name": product.product_name,
                 "prices": product.prices,
                 "rating_count": product.rating_count,
-                "attributes": product.attributes
+                "attributes": product.attributes  # Include attributes in the document source
             }
         }
         for product in products
@@ -104,7 +105,7 @@ def create_index_if_not_exists(client, logger):
                     "product_name": {"type": "text"},
                     "prices": {"type": "float"},
                     "rating_count": {"type": "keyword"},
-                    "attributes": {"type": "object", "enabled": False}  # Store as an object without indexing
+                    "attributes": {"type": "object", "enabled": False}  # Store attributes as an object without indexing
                 }
             }
         })
@@ -181,7 +182,7 @@ def main():
 
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_55.flag"
+    flag_file_path = "flags/indexing_done_53.flag"
 
     if not os.path.exists(flag_file_path):
 
