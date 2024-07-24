@@ -7,7 +7,8 @@ using HtmlAgilityPack;
 using Nest;
 
 namespace ProductScraper
-{
+{   
+    
     public class Product
     {
         public string? ProductName { get; set; }
