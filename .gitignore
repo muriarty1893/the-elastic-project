@@ -1,3 +1,8 @@
+TScrape/bin
+TScrape/obj
+TScrape.csproj
+docker-compose.yml
+flags
 TScrape/obj/Debug/net8.0/TScrape.AssemblyInfo.cs
 
 .fake
