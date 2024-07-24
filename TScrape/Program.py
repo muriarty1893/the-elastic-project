@@ -7,7 +7,7 @@ import time
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-
+import numpy as np
 
 
 indexname = "indext7"
@@ -174,6 +174,15 @@ def search_products(client, search_text, logger):
     for bucket in search_response['aggregations']['price_ranges']['buckets']:
         print(f"Price range: {bucket['key']} - Doc count: {bucket['doc_count']}")
 
+def parse_dpi(dpi_str):
+    try:
+        if ' - ' in dpi_str:
+            dpi_values = list(map(int, dpi_str.split(' - ')))
+            return int(np.mean(dpi_values))
+        return int(dpi_str.split()[0])
+    except:
+        return 0
+
 def collect_data(products):
     data = []
     for product in products:
@@ -181,7 +190,7 @@ def collect_data(products):
             "product_name": product.product_name,
             "price": product.prices[0] if product.prices else 0,
             "rating_count": int(product.rating_count.replace("(","").replace(")","")) if product.rating_count else 0,
-            "dpi": product.attributes.get("dpi", 0),
+            "dpi": parse_dpi(product.attributes.get("dpi", "0")),
             "rgb_lighting": 1 if product.attributes.get("rgb_lighting") == "Evet" else 0,
             "mouse_type": product.attributes.get("mouse_type", ""),
             "button_count": int(product.attributes.get("button_count", 0))
@@ -228,7 +237,6 @@ def suggest_product_features(budget, model):
                         best_features = features_values
 
     return dict(zip(features, best_features))
-
 
 def main():
     start_time1 = time.time()
@@ -277,9 +285,5 @@ def main():
     suggested_features = suggest_product_features(budget, model)
     print(f"Suggested features for budget {budget}: {suggested_features}")
 
-
-
 if __name__ == "__main__":
     main()
-# PRAISE
-# not fail but slow
