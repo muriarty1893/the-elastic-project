@@ -137,10 +137,7 @@ def search_products(client, search_text, logger):
                         "field": "prices",
                         "ranges": [
                             {"to": 50},
-                            {"from": 50, "to": 200},
-                            {"from": 200, "to": 500},
-                            {"from": 500, "to": 750},
-                            {"from": 750, "to": 1000},
+                            {"from": 50, "to": 1000},
                             {"from": 1000}
                         ]
                     }
