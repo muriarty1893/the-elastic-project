@@ -5,17 +5,17 @@ import logging
 import os
 import time
 
-indexname = "ml-2"
+indexname="ml-3"
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, dpi=None, rgb_lighting=None, mouse_type=None, button_count=None):
         self.product_name = product_name
         self.prices = prices or []
         self.rating_count = rating_count or []
-        self.dpi = dpi or []
-        self.rgb_lighting = rgb_lighting or []
-        self.mouse_type = mouse_type or []
-        self.button_count = button_count or []
+        self.dpi = dpi or ""
+        self.rgb_lighting = rgb_lighting or ""
+        self.mouse_type = mouse_type or ""
+        self.button_count = button_count or ""
 
 def create_elastic_client():
     return Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
@@ -34,10 +34,18 @@ def scrape_web():
             product_name_node = node.select_one("h3.prdct-desc-cntnr-ttl-w")
             price_node = node.select_one("div.prc-box-dscntd")
             rating_count_node = node.select_one("span.ratingCount")
-            dpi_node = node.select_one('span[title="Mouse Hassasiyeti (Dpi)"] + span.attribute-value > div.attr-name.attr-name-w')
-            rgb_lighting_node = node.select_one('span[title="RGB Aydınlatma"] + span.attribute-value > div.attr-name.attr-name-w')
-            mouse_type_node = node.select_one('span[title="Mouse Tipi"] + span.attribute-value > div.attr-name.attr-name-w')
-            button_count_node = node.select_one('span[title="Buton Sayısı"] + span.attribute-value > div.attr-name.attr-name-w')
+            
+            attributes = {
+                'dpi': 'Mouse Hassasiyeti (Dpi)',
+                'rgb_lighting': 'RGB Aydınlatma',
+                'mouse_type': 'Mouse Tipi',
+                'button_count': 'Buton Sayısı'
+            }
+            
+            attribute_values = {}
+            for key, title in attributes.items():
+                attribute_node = node.select_one(f'span[title="{title}"] + span.attribute-value > div.attr-name.attr-name-w')
+                attribute_values[key] = attribute_node.get_text().strip() if attribute_node else None
 
             product_name = (
                 " ".join([
@@ -51,19 +59,15 @@ def scrape_web():
             if price:
                 price = float(price.replace("TL", "").replace(",", "").replace(".", ""))
             rating_count = rating_count_node.get_text().strip() if rating_count_node else None
-            dpi = dpi_node.get_text().strip() if dpi_node else None
-            rgb_lighting = rgb_lighting_node.get_text().strip() if rgb_lighting_node else None
-            mouse_type = mouse_type_node.get_text().strip() if mouse_type_node else None
-            button_count = button_count_node.get_text().strip() if button_count_node else None
 
             product = Product(
                 product_name=product_name,
                 prices=[price] if price else [],
                 rating_count=rating_count,
-                dpi=dpi,
-                rgb_lighting=rgb_lighting,
-                mouse_type=mouse_type,
-                button_count=button_count
+                dpi=attribute_values['dpi'],
+                rgb_lighting=attribute_values['rgb_lighting'],
+                mouse_type=attribute_values['mouse_type'],
+                button_count=attribute_values['button_count']
             )
             products.append(product)
         
@@ -105,7 +109,6 @@ def create_index_if_not_exists(client, logger):
                 }
             }
         })
-
 
 def search_products(client, search_text, logger):
     search_response = client.search(
@@ -173,7 +176,6 @@ def search_products(client, search_text, logger):
 
 def features():
     print("praise")
-    
 
 def main():
     start_time1 = time.time()
@@ -187,7 +189,7 @@ def main():
 
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_47.flag"
+    flag_file_path = "flags/indexing_done_45.flag"
 
     if not os.path.exists(flag_file_path):
 
