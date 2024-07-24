@@ -6,3 +6,4 @@ docker compose setup;
       - ELASTIC_PASSWORD=murat1
 
 converted to python and changed the materials to be scraped
+PRAISE
