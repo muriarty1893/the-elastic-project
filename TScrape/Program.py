@@ -4,6 +4,11 @@ from elasticsearch import Elasticsearch, helpers
 import logging
 import os
 import time
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+
 
 indexname = "indext6"
 flagname = "flags/indexing_done_58.flag"
@@ -169,6 +174,62 @@ def search_products(client, search_text, logger):
     for bucket in search_response['aggregations']['price_ranges']['buckets']:
         print(f"Price range: {bucket['key']} - Doc count: {bucket['doc_count']}")
 
+def collect_data(products):
+    data = []
+    for product in products:
+        product_data = {
+            "product_name": product.product_name,
+            "price": product.prices[0] if product.prices else 0,
+            "rating_count": int(product.rating_count.replace("(","").replace(")","")) if product.rating_count else 0,
+            "dpi": product.attributes.get("dpi", 0),
+            "rgb_lighting": 1 if product.attributes.get("rgb_lighting") == "Evet" else 0,
+            "mouse_type": product.attributes.get("mouse_type", ""),
+            "button_count": int(product.attributes.get("button_count", 0))
+        }
+        data.append(product_data)
+    return pd.DataFrame(data)
+
+def train_model(df):
+    features = ["rating_count", "dpi", "rgb_lighting", "button_count"]
+    X = df[features]
+    y = df["price"]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    score = model.score(X_test, y_test)
+    print(f"Model R^2 Score: {score}")
+
+    return model
+
+def suggest_product_features(budget, model):
+    features = ["rating_count", "dpi", "rgb_lighting", "button_count"]
+    feature_ranges = {
+        "rating_count": range(0, 1000, 50),
+        "dpi": range(100, 16000, 500),
+        "rgb_lighting": [0, 1],
+        "button_count": range(1, 20)
+    }
+    
+    best_features = None
+    min_diff = float('inf')
+
+    for rating_count in feature_ranges["rating_count"]:
+        for dpi in feature_ranges["dpi"]:
+            for rgb_lighting in feature_ranges["rgb_lighting"]:
+                for button_count in feature_ranges["button_count"]:
+                    features_values = [rating_count, dpi, rgb_lighting, button_count]
+                    predicted_price = model.predict([features_values])[0]
+                    diff = abs(budget - predicted_price)
+                    if diff < min_diff:
+                        min_diff = diff
+                        best_features = features_values
+
+    return dict(zip(features, best_features))
+
+
 def main():
     start_time1 = time.time()
 
@@ -205,6 +266,18 @@ def main():
         total_duration = time.time() - start_time1
         print(f"Search completed in {search_duration * 1000:.2f} ms.")
         print(f"All completed in {total_duration * 1000:.2f} ms.")
+
+    products, _ = scrape_web()
+    df = collect_data(products)
+    print(df.head())
+
+    model = train_model(df)
+
+    budget = 500
+    suggested_features = suggest_product_features(budget, model)
+    print(f"Suggested features for budget {budget}: {suggested_features}")
+
+
 
 if __name__ == "__main__":
     main()
