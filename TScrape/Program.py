@@ -5,7 +5,7 @@ import logging
 import os
 import time
 
-indexname = "indext1"
+indexname = "indext2" 
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None):
@@ -32,7 +32,7 @@ def scrape_web():
             rating_count_node = node.select_one("span.ratingCount")
 
             product_name = (
-                " ".join([
+                " ".join([  
                     product_name_node.select_one("span.prdct-desc-cntnr-ttl").get_text().strip() if product_name_node.select_one("span.prdct-desc-cntnr-ttl") else "",
                     product_name_node.select_one("span.prdct-desc-cntnr-name").get_text().strip() if product_name_node.select_one("span.prdct-desc-cntnr-name") else "",
                     product_name_node.select_one("div.product-desc-sub-text").get_text().strip() if product_name_node.select_one("div.product-desc-sub-text") else ""
@@ -155,7 +155,7 @@ def main():
 
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_53.flag"
+    flag_file_path = "flags/indexing_done_54.flag"
 
     if not os.path.exists(flag_file_path):
 
