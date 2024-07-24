@@ -5,7 +5,7 @@ import logging
 import os
 import time
 
-indexname="ml-4"
+indexname="ml-6"
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, dpi=None, rgb_lighting=None, mouse_type=None, button_count=None):
@@ -44,8 +44,12 @@ def scrape_web():
             
             attribute_values = {}
             for key, title in attributes.items():
-                attribute_node = node.select_one(f'span[title="{title}"] + span.attribute-value > div.attr-name.attr-name-w')
-                attribute_values[key] = attribute_node.get_text().strip() if attribute_node else None
+                attribute_label_node = node.select_one(f'span[title="{title}"]')
+                if attribute_label_node:
+                    attribute_value_node = attribute_label_node.find_next_sibling('span', class_='attribute-value')
+                    if attribute_value_node:
+                        div_node = attribute_value_node.select_one('div.attr-name.attr-name-w')
+                        attribute_values[key] = div_node.get_text().strip() if div_node else None
 
             product_name = (
                 " ".join([
@@ -64,10 +68,10 @@ def scrape_web():
                 product_name=product_name,
                 prices=[price] if price else [],
                 rating_count=rating_count,
-                dpi=attribute_values['dpi'],
-                rgb_lighting=attribute_values['rgb_lighting'],
-                mouse_type=attribute_values['mouse_type'],
-                button_count=attribute_values['button_count']
+                dpi=attribute_values.get('dpi'),
+                rgb_lighting=attribute_values.get('rgb_lighting'),
+                mouse_type=attribute_values.get('mouse_type'),
+                button_count=attribute_values.get('button_count')
             )
             products.append(product)
         
@@ -140,7 +144,10 @@ def search_products(client, search_text, logger):
                         "field": "prices",
                         "ranges": [
                             {"to": 50},
-                            {"from": 50, "to": 1000},
+                            {"from": 50, "to": 200},
+                            {"from": 200, "to": 500},
+                            {"from": 500, "to": 750},
+                            {"from": 750, "to": 1000},
                             {"from": 1000}
                         ]
                     }
@@ -189,7 +196,7 @@ def main():
 
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_49.flag"
+    flag_file_path = "flags/indexing_done_52.flag"
 
     if not os.path.exists(flag_file_path):
 
