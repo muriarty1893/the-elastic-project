@@ -5,6 +5,8 @@ import logging
 import os
 import time
 
+indexname = "indext1"
+
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None):
         self.product_name = product_name
@@ -56,7 +58,7 @@ def scrape_web():
 def index_products(client, products, logger):
     actions = [
         {
-            "_index": "olderone",
+            "_index": indexname,
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -69,8 +71,8 @@ def index_products(client, products, logger):
     helpers.bulk(client, actions)
 
 def create_index_if_not_exists(client, logger):
-    if not client.indices.exists(index="olderone"):
-        client.indices.create(index="olderone", body={
+    if not client.indices.exists(index=indexname):
+        client.indices.create(index=indexname, body={
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -83,7 +85,7 @@ def create_index_if_not_exists(client, logger):
 
 def search_products(client, search_text, logger):
     search_response = client.search(
-        index="olderone",
+        index=indexname,
         body={
             "query": {
                 "bool": {
@@ -111,10 +113,7 @@ def search_products(client, search_text, logger):
                         "field": "prices",
                         "ranges": [
                             {"to": 50},
-                            {"from": 50, "to": 200},
-                            {"from": 200, "to": 500},
-                            {"from": 500, "to": 750},
-                            {"from": 750, "to": 1000},
+                            {"from": 50, "to": 1000},
                             {"from": 1000}
                         ]
                     }
@@ -156,7 +155,7 @@ def main():
 
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_45.flag"
+    flag_file_path = "flags/indexing_done_53.flag"
 
     if not os.path.exists(flag_file_path):
 
