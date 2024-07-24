@@ -5,29 +5,26 @@ import logging
 import os
 import time
 
-# Ürün bilgilerini tutan sınıf
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None):
         self.product_name = product_name
         self.prices = prices or []
         self.rating_count = rating_count or []
 
-# Elasticsearch istemcisini oluşturur
 def create_elastic_client():
     return Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
 
-# Web'den veri çekme işlemi
 def scrape_web():
-    url = "https://www.trendyol.com/sr/oyuncu-mouselari-x-c106088?sst=BEST_SELLER"  # Veri çekilecek web sitesi
+    url = "https://www.trendyol.com/sr/oyuncu-mouselari-x-c106088?sst=BEST_SELLER"
     response = requests.get(url)
     products = []
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
-        product_nodes = soup.select('div.p-card-wrppr')  # Ürün kartlarını seçiyoruz
+        product_nodes = soup.select('div.p-card-wrppr')
 
         for node in product_nodes:
-            # Ürün ismi, fiyatı ve rating count bilgilerini çekiyoruz
+
             product_name_node = node.select_one("h3.prdct-desc-cntnr-ttl-w")
             price_node = node.select_one("div.prc-box-dscntd")
             rating_count_node = node.select_one("span.ratingCount")
@@ -52,11 +49,10 @@ def scrape_web():
             )
             products.append(product)
         
-        return products, soup  # soup değişkenini de döndürüyoruz
+        return products, soup
 
     return products, None
 
-# Elasticsearch'e ürünleri indeksler
 def index_products(client, products, logger):
     actions = [
         {
@@ -72,7 +68,6 @@ def index_products(client, products, logger):
 
     helpers.bulk(client, actions)
 
-# Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
 def create_index_if_not_exists(client, logger):
     if not client.indices.exists(index="olderone"):
         client.indices.create(index="olderone", body={
@@ -86,8 +81,7 @@ def create_index_if_not_exists(client, logger):
         })
 
 
-# Elasticsearch'te verilen metinle eşleşen ürünleri arar
-def search_products(client, search_text, logger): # 
+def search_products(client, search_text, logger):
     search_response = client.search(
         index="olderone",
         body={
@@ -118,8 +112,9 @@ def search_products(client, search_text, logger): #
                         "ranges": [
                             {"to": 50},
                             {"from": 50, "to": 200},
-                            {"from": 200, "to": 600},
-                            {"from": 600, "to": 1000},
+                            {"from": 200, "to": 500},
+                            {"from": 500, "to": 750},
+                            {"from": 750, "to": 1000},
                             {"from": 1000}
                         ]
                     }
@@ -149,40 +144,35 @@ def search_products(client, search_text, logger): #
     for bucket in search_response['aggregations']['price_ranges']['buckets']:
         print(f"Price range: {bucket['key']} - Doc count: {bucket['doc_count']}")
 
-# Ana fonksiyon
 def main():
     start_time1 = time.time()
-    # Logger kurulumu
+
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("ProductScraper")
     
-    # Elasticsearch istemcisini oluşturur
     client = create_elastic_client()
 
-    # Elasticsearch'te index varsa kontrol eder, yoksa oluşturur
     create_index_if_not_exists(client, logger)
 
-    # Web sitesinden ürünleri çeker
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_45.flag"  # Dosya oluşturmak için
+    flag_file_path = "flags/indexing_done_45.flag"
 
-    # Dosyanın oluşturulup oluşturulmadığını kontrol eder
     if not os.path.exists(flag_file_path):
-        # Çekilen ürünleri Elasticsearch'e indeksler
+
         index_products(client, products, logger)
-        # Dosya oluşturularak indekslemenin yapıldığını işaretler
+
         os.makedirs(os.path.dirname(flag_file_path), exist_ok=True)
+
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "steelseries"  # Kullanıcı girdisi
+    item = "steelseries"
     if os.path.exists(flag_file_path):
         start_time2 = time.time()
-        search_products(client, item, logger)  # Elasticsearch'te girilen kelimeyi arar
+        search_products(client, item, logger)
         search_duration = time.time() - start_time2
-        
-        # Sıralama seçeneğini yazdırır
+
         print("Sorting Option:\n--------------------------------------------")
         sorting_option = soup.select_one('div.selected-order')
         if sorting_option:
@@ -193,7 +183,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-# le 
-#   toucan  
-#         has
-#           arrived
+# PRAISE
