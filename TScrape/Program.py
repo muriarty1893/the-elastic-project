@@ -5,7 +5,7 @@ import logging
 import os
 import time
 
-indexname="ml-3"
+indexname="ml-4"
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, dpi=None, rgb_lighting=None, mouse_type=None, button_count=None):
@@ -189,7 +189,7 @@ def main():
 
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_45.flag"
+    flag_file_path = "flags/indexing_done_49.flag"
 
     if not os.path.exists(flag_file_path):
 
