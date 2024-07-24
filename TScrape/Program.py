@@ -5,7 +5,8 @@ import logging
 import os
 import time
 
-indexname = "indext1" 
+indexname = "indext6"
+flagname = "flags/indexing_done_58.flag"
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, attributes=None):
@@ -24,7 +25,7 @@ def scrape_web():
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
-        product_nodes = soup.select('div.p-card-wrppr')
+        product_nodes = soup.select('div.p-card-chldrn-cntnr.card-border')
 
         for node in product_nodes:
             product_name_node = node.select_one("h3.prdct-desc-cntnr-ttl-w")
@@ -55,7 +56,7 @@ def scrape_web():
                 attributes=attributes  # Add attributes to the product
             )
             products.append(product)
-        
+
         return products, soup
 
     return products, None
@@ -182,7 +183,7 @@ def main():
 
     products, soup = scrape_web()
 
-    flag_file_path = "flags/indexing_done_53.flag"
+    flag_file_path = flagname
 
     if not os.path.exists(flag_file_path):
 
