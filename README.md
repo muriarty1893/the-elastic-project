@@ -1,4 +1,4 @@
-# Trendyol Best Seller Mouse Scraper
+# Elastic-search Trendyol Scraper 
 
 This project scrapes the best-selling gaming mice from Trendyol and indexes the data into Elasticsearch. It allows for fuzzy searching of the indexed products.
 
