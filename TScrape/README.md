@@ -1,5 +1,6 @@
 # Trendyol Best Seller Mouse Scraper
 
+<<<<<<< HEAD
 This project scrapes the best-selling gaming mice from Trendyol and indexes the data into Elasticsearch. It allows for fuzzy searching of the indexed products.
 
 ## :ledger: Index
@@ -80,3 +81,7 @@ pip install -r requirements.txt
 ## :lock: License
 
 Add a license here, or a link to it.
+=======
+converted to python and changed the materials to be scraped
+PRAISE
+>>>>>>> config_for_features
