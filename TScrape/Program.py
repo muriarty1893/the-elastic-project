@@ -83,12 +83,8 @@ def scrape_product_details(url):
 
 def index_products(client, products, logger):
     actions = [
-        {
-<<<<<<< HEAD
-            "_index": "tms",
-=======
+        {  
             "_index": indexname,
->>>>>>> config_for_features
             "_source": {
                 "product_name": product.product_name,
                 "prices": product.prices,
@@ -102,13 +98,9 @@ def index_products(client, products, logger):
     helpers.bulk(client, actions)
 
 def create_index_if_not_exists(client, logger):
-<<<<<<< HEAD
-    if not client.indices.exists(index="tms"):
-        client.indices.create(index="tms", body={
-=======
+
     if not client.indices.exists(index=indexname):
         client.indices.create(index=indexname, body={
->>>>>>> config_for_features
             "mappings": {
                 "properties": {
                     "product_name": {"type": "text"},
@@ -121,11 +113,7 @@ def create_index_if_not_exists(client, logger):
 
 def search_products(client, search_text, logger):
     search_response = client.search(
-<<<<<<< HEAD
-        index="tms",
-=======
         index=indexname,
->>>>>>> config_for_features
         body={
             "query": {
                 "bool": {
@@ -193,12 +181,7 @@ def main():
     create_index_if_not_exists(client, logger)
 
     products, soup = scrape_web()
-
-<<<<<<< HEAD
-    flag_file_path = "flags/indexing_done_38.flag"  # Dosya oluşturmak için
-=======
     flag_file_path = flagname
->>>>>>> config_for_features
 
     if not os.path.exists(flag_file_path):
 
@@ -214,11 +197,7 @@ def main():
         start_time2 = time.time()
         search_products(client, item, logger)
         search_duration = time.time() - start_time2
-<<<<<<< HEAD
-        # Sıralama seçeneğini yazdırır
-=======
 
->>>>>>> config_for_features
         print("Sorting Option:\n--------------------------------------------")
         sorting_option = soup.select_one('div.selected-order')
         if sorting_option:
