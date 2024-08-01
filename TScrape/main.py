@@ -10,8 +10,8 @@ def main():
     
     logger = create_logger()
     
-    indexname = "indext31"
-    flagname = "flags/indexing_done_81.flag"
+    indexname = "indext32"
+    flagname = "flags/indexing_done_82.flag"
     
     indexer = Indexer(indexname)
     scraper = Scraper()
