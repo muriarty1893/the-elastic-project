@@ -5,8 +5,8 @@ import logging
 import os
 import time
 
-indexname = "indext16"
-flagname = "flags/indexing_done_66.flag"
+indexname = "indext30"
+flagname = "flags/indexing_done_80.flag"
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, attributes=None):
