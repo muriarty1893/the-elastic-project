@@ -10,7 +10,7 @@ def main():
     
     logger = create_logger()
     
-    indexname = "indext32" # user input here ----------------------------------------------------------------
+    indexname = "indext32" 
     flagname = "flags/indexing_done_82.flag"
     
     indexer = Indexer(indexname)
@@ -30,7 +30,8 @@ def main():
         with open(flag_file_path, 'w') as flag_file:
             flag_file.write('')
 
-    item = "steelseries"
+    item = input("\nItem to search: ") # user input here ----------------------------------------------------------------
+    
     if os.path.exists(flag_file_path):
         start_time2 = time.time()
         searcher.search_products(indexer.client, item, logger)
