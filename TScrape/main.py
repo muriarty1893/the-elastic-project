@@ -10,7 +10,7 @@ def main():
     
     logger = create_logger()
     
-    indexname = "indext32"
+    indexname = "indext32" # user input here ----------------------------------------------------------------
     flagname = "flags/indexing_done_82.flag"
     
     indexer = Indexer(indexname)
