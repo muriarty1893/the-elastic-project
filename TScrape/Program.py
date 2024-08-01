@@ -5,8 +5,8 @@ import logging
 import os
 import time
 
-indexname = "indext30"
-flagname = "flags/indexing_done_80.flag"
+indexname = "indext31"
+flagname = "flags/indexing_done_81.flag"
 
 class Product:
     def __init__(self, product_name=None, prices=None, rating_count=None, attributes=None):
@@ -208,5 +208,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-# PRAISE
-# not fail but slow
