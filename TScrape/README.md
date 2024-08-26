@@ -74,11 +74,3 @@ pip install -r requirements.txt
 | 1  | trendyol_scraper.py | Main script to scrape data and index into Elasticsearch |
 | 2  | requirements.txt | List of Python dependencies |
 | 3  | README.md | Project documentation |
-
-## :lock: License
-
-Add a license here, or a link to it.
-=======
-converted to python and changed the materials to be scraped
-PRAISE
->>>>>>> config_for_features
