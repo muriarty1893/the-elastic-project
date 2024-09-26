@@ -31,7 +31,7 @@ cd trendyol-scraper
 3. Install the required Python packages:
 pip install -r requirements.txt
 
-4. Ensure you have Elasticsearch running locally or configure the connection parameters in the `create_elastic_client` function.
+4. Ensure you have Elasticsearch running locally and configure the connection parameters in the `create_elastic_client` function.
 
 ### :package: Commands
 
