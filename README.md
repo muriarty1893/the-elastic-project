@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 ### :package: Commands
 
-- To run the scraper and index data into Elasticsearch:
+- To run the scraper, index data into Elasticsearch and searching:
 python trendyol_scraper.py
 
 ## :wrench: Development
