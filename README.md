@@ -45,19 +45,6 @@ python trendyol_scraper.py
 - Python 3.x
 - Elasticsearch 7.x
 
-### :nut_and_bolt: Development Environment
-
-1. Clone the repository:
-git clone https://github.com/yourusername/trendyol-scraper.git
-
-2. Navigate to the project directory:
-cd trendyol-scraper
-
-3. Install the required Python packages:
-pip install -r requirements.txt
-
-4. Ensure you have Elasticsearch running locally or configure the connection parameters in the `create_elastic_client` function.
-
 ### :file_folder: File Structure
 .
 
