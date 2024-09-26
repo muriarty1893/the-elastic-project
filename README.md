@@ -1,6 +1,6 @@
 # Elastic-search Practical Testing
 
-This project scrapes the best-selling gaming mice from Trendyol and indexes the data into Elasticsearch. It allows for fuzzy searching of the indexed products.
+This project scrapes the best-selling gaming mice from Trendyol and indexes the data into Elasticsearch to use the search engine. It allows for fuzzy searching of the indexed products.
 
 ## :ledger: Index
 
