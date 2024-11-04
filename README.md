@@ -4,7 +4,6 @@ This project scrapes the best-selling gaming mouse from Trendyol website and ind
 
 ## :ledger: Index
 
-- [About](#beginner-about)
 - [Usage](#zap-usage)
   - [Installation](#electric_plug-installation)
   - [Commands](#package-commands)
@@ -13,10 +12,6 @@ This project scrapes the best-selling gaming mouse from Trendyol website and ind
   - [Development Environment](#nut_and_bolt-development-environment)
   - [File Structure](#file_folder-file-structure)
 - [License](#lock-license)
-
-## :beginner: About
-
-This project scrapes data from Trendyol's best-selling gaming mice page, processes the data, and indexes it into an Elasticsearch instance. The indexed data can then be searched using fuzzy search capabilities.
 
 ## :zap: Usage
 
