@@ -2,7 +2,7 @@
 
 This project scrapes the best-selling gaming mouse from Trendyol website and indexes the data into Elasticsearch to use the search engine. It allows for fuzzy searching of the indexed products.
 
-## :ledger: Index
+## Index
 
 - [Usage](#zap-usage)
   - [Installation](#electric_plug-installation)
@@ -13,9 +13,9 @@ This project scrapes the best-selling gaming mouse from Trendyol website and ind
   - [File Structure](#file_folder-file-structure)
 - [License](#lock-license)
 
-## :zap: Usage
+## Usage
 
-### :electric_plug: Installation
+### Installation
 
 1. Clone the repository:
 git clone https://github.com/yourusername/trendyol-scraper.git
@@ -28,19 +28,19 @@ pip install -r requirements.txt
 
 4. Ensure you have Elasticsearch running locally and configure the connection parameters in the `create_elastic_client` function.
 
-### :package: Commands
+### Commands
 
 - To run the scraper, index data into Elasticsearch and searching:
 python trendyol_scraper.py
 
-## :wrench: Development
+## Development
 
 ### :notebook: Pre-Requisites
 
 - Python 3.x
 - Elasticsearch 7.x
 
-### :file_folder: File Structure
+### File Structure
 .
 
 ├── flags
