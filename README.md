@@ -35,7 +35,7 @@ python trendyol_scraper.py
 
 ## Development
 
-### :notebook: Pre-Requisites
+### Pre-Requisites
 
 - Python 3.x
 - Elasticsearch 7.x
